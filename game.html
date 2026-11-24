@@ -435,11 +435,12 @@ let overMsg = '', winMsg = '';
 function drink(w) {
   if (scene !== 'play' || paused || w.drinkT > 0 || w.down) return;
   if (w.energyT > .9) { if (w === wolf) popup('zaten enerjiksin!', w.x, w.y - 34, '#c6f08a'); return; }
+  if (w.dl <= 0) { if (w === wolf) popup('raund içme hakkın bitti!', w.x, w.y - 34, '#ffb3b3'); return; }
   if (w.stock <= 0) { if (w === wolf) popup('matcha yok!', w.x, w.y - 34, '#ffb3b3'); return; }
-  w.stock--; w.drinkT = .45; w.energyT = Math.min(1, Math.max(0, w.energyT) + .85); sfx.slurp(); burst(w.x, w.y - 10, '#9be36b', 20); popup(pick(MEME_DRINK), w.x, w.y - 40, '#c6f08a');
+  w.stock--; w.dl--; w.drinkT = .45; w.energyT = Math.min(1, Math.max(0, w.energyT) + .85); sfx.slurp(); burst(w.x, w.y - 10, '#9be36b', 20); popup(pick(MEME_DRINK), w.x, w.y - 40, '#c6f08a');
 }
 function doDash() {
-  if (net.role === 'guest') { if (scene === 'play' && !wolf.down && wolf.stock > 0 && wolf.drinkT <= 0) netSend({ t: 'dr' }); return; }
+  if (net.role === 'guest') { if (scene === 'play' && !wolf.down && wolf.stock > 0 && wolf.dl > 0 && wolf.drinkT <= 0) netSend({ t: 'dr' }); return; }
   drink(wolf);
 }
 function inputVec() {
@@ -450,7 +451,7 @@ function inputVec() {
   const m = Math.hypot(vx, vy); if (m > 1) { vx /= m; vy /= m; }
   return [vx, vy];
 }
-function mkWolf(x, y, skin, local) { return { x, y, r: 17, dir: 1, energyT: 0, drinkT: 0, stock: 1, trail: [], face: 1, inv: 0, skin, on: true, local, in: { vx: 0, vy: 0 }, moving: false }; }
+function mkWolf(x, y, skin, local) { return { x, y, r: 17, dir: 1, energyT: 0, drinkT: 0, dl: 2, stock: 1, trail: [], face: 1, inv: 0, skin, on: true, local, in: { vx: 0, vy: 0 }, moving: false }; }
 function nearest(o) { let b = null, bd = 1e9; for (const P of players) if (P.on && !P.down) { const d = dist(o, P); if (d < bd) { bd = d; b = P; } } if (b) return b; for (const P of players) if (P.on) return P; return players[0]; }
 function stepWolf(wolf, vx, vy, dt) {
   const slow = hazards.some(h => h.k === 'puddle' && dist(h, wolf) < h.r) ? .5 : 1;
@@ -1417,7 +1418,7 @@ function onNetData(d) {
 function buildSnap() {
   const q = {
     t: 'st', sc: scene, L, ip: +Math.max(0, introT).toFixed(2), lv: lives, g: got, s: score, om: overMsg, wm: winMsg,
-    w: players.map(P => ({ x: +P.x.toFixed(1), y: +P.y.toFixed(1), f: P.face, e: +P.energyT.toFixed(2), dr: +P.drinkT.toFixed(2), st: P.stock, iv: +P.inv.toFixed(2), k: P.skin, o: P.on ? 1 : 0, h: P.hp, d: P.down ? 1 : 0, rv: +(P.rv || 0).toFixed(2) })),
+    w: players.map(P => ({ x: +P.x.toFixed(1), y: +P.y.toFixed(1), f: P.face, e: +P.energyT.toFixed(2), dr: +P.drinkT.toFixed(2), st: P.stock, dl: P.dl, iv: +P.inv.toFixed(2), k: P.skin, o: P.on ? 1 : 0, h: P.hp, d: P.down ? 1 : 0, rv: +(P.rv || 0).toFixed(2) })),
     m: matchas.map(m => [Math.round(m.x), Math.round(m.y), m.gold ? 1 : 0, +m.ph.toFixed(1)]),
     r: rivals.map(e => { const o = { x: +e.x.toFixed(1), y: +e.y.toFixed(1), t: +e.t.toFixed(2), st: e.st, tele: e.tele || null, ln: e.lane || null, vx: Math.round(e.vx || 0), vy: Math.round(e.vy || 0), cr: e.carry ? 1 : 0, sn: +(e.stun || 0).toFixed(2) }; if (e.type === 'queue') o.sg = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => { const p = e.hist[Math.max(0, e.hist.length - 1 - k * 22)]; return [Math.round(p.x), Math.round(p.y)]; }); return o; }),
     h: hazards.map(h => { const o = Object.assign({}, h); delete o.own; delete o.src; return o; }),
@@ -1436,7 +1437,7 @@ function applySnap(d) {
   if (d.sc === 'cleared' || d.sc === 'over' || d.sc === 'final') { if (scene !== d.sc) { scene = d.sc; setBtns(); } }
   L = d.L; introT = d.ip || 0; lives = d.lv; got = d.g; score = d.s; overMsg = d.om; winMsg = d.wm;
   d.w.forEach((q, i) => {
-    const P = players[i]; if (!P) return; P.on = !!q.o; P.skin = q.k; P.stock = q.st; P.energyT = q.e; P.drinkT = q.dr; P.inv = q.iv; P.hp = q.h; P.down = !!q.d; P.rv = q.rv || 0;
+    const P = players[i]; if (!P) return; P.on = !!q.o; P.skin = q.k; P.stock = q.st; P.dl = q.dl === undefined ? 2 : q.dl; P.energyT = q.e; P.drinkT = q.dr; P.inv = q.iv; P.hp = q.h; P.down = !!q.d; P.rv = q.rv || 0;
     if (P === wolf) { const ex = q.x - P.x, ey = q.y - P.y, er = Math.hypot(ex, ey); if (er > 70) { P.x = q.x; P.y = q.y; } else if (er > 35) { P.x += ex * .25; P.y += ey * .25; } }
     else { P.face = q.f; const nw = performance.now(), ds = (nw - (P.qt || 0)) / 1000; if (P.tx !== undefined && ds > .005 && ds < .5 && Math.hypot(q.x - P.tx, q.y - P.ty) < 120) { P.vx2 = (q.x - P.tx) / ds; P.vy2 = (q.y - P.ty) / ds; } else { P.vx2 = 0; P.vy2 = 0; } P.qt = nw; P.tx = q.x; P.ty = q.y; if (P.x === undefined || Math.hypot(P.x - q.x, P.y - q.y) > 150) { P.x = q.x; P.y = q.y; } }
   });
@@ -1664,7 +1665,7 @@ function drawHUD() {
   if (princess) { const a = Math.atan2(princess.y - wolf.y, princess.x - wolf.x), sx = wolf.x - cam.x, sy = wolf.y - cam.y; ctx.save(); ctx.translate(sx + Math.cos(a) * 44, sy + Math.sin(a) * 44); ctx.rotate(a); ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-6, -8); ctx.lineTo(-6, 8); ctx.closePath(); ctx.fill(); ctx.restore(); txt('Prenses\'e git!  (' + Math.round(dist(princess, wolf) / 10) + ' m)', W / 2, FIELD_TOP + 14, 22, '#ffe08a'); }
   drawMinimap();
   // matcha iç düğmesi
-  const can = wolf.stock > 0, act = wolf.energyT > 0;
+  const can = wolf.stock > 0 && wolf.dl > 0, act = wolf.energyT > 0;
   ctx.fillStyle = act ? 'rgba(130,240,100,.38)' : can ? 'rgba(130,240,100,.26)' : 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.arc(dashBtn.x, dashBtn.y, dashBtn.r, 0, 7); ctx.fill();
   ctx.strokeStyle = can || act ? '#9be36b' : 'rgba(255,255,255,.35)'; ctx.lineWidth = 5; ctx.stroke();
   if (act) { ctx.strokeStyle = '#e6ffc8'; ctx.beginPath(); ctx.arc(dashBtn.x, dashBtn.y, dashBtn.r - 7, -Math.PI / 2, -Math.PI / 2 + wolf.energyT * 6.283); ctx.stroke(); }
@@ -1672,6 +1673,7 @@ function drawHUD() {
   txt(act ? 'ENERJİ %' + Math.round(wolf.energyT * 100) : 'MATCHA İÇ [E]', dashBtn.x, dashBtn.y + 29, act ? 12 : 11, '#fff', 'center', '800', false);
   ctx.fillStyle = can ? '#3fae5a' : '#555a66'; ctx.beginPath(); ctx.arc(dashBtn.x + 40, dashBtn.y - 40, 15, 0, 7); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
   txt(String(wolf.stock), dashBtn.x + 40, dashBtn.y - 39, 17, '#fff', 'center', '900', false);
+  txt('hak: ' + wolf.dl + '/2', dashBtn.x, dashBtn.y + 62, 13, '#d8ffb0', 'center', '800', false);
   // joystick
   if (joyState.id !== null) {
     ctx.fillStyle = 'rgba(255,255,255,.14)'; ctx.beginPath(); ctx.arc(joyState.ox, joyState.oy, 62, 0, 7); ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.5)'; ctx.lineWidth = 3; ctx.stroke();
