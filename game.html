@@ -119,9 +119,54 @@ const LEVELS = [
   { name: 'Bayilik Fırsatı', quota: 16, rivals: ['fund', 'queue', 'ballerina', 'cat'], rivalName: 'Bayilik Danışmanı + Kuyruk + Balerin + Kedi',
     intro: 'Bayilik danışmanı para yağdırıyor, kuyruk dolanıyor, balerin ışınlanıyor. Üçlü kaos!',
     win: 'Danışman "geri dönüş garantili" diyerek çöle kaçtı. Geri dönüş yok.' },
-  { name: 'Final: Franchise Baronu', quota: 18, rivals: ['barista', 'queue', 'croc', 'baron', 'kargo', 'teyze'], rivalName: 'Franchise Baronu ve Çetesi',
-    intro: 'Franchise Baronu zam etiketleri yağdırıyor, çetesi fincan fırlatıyor, kuyruk dolanıyor, timsah bomba atıyor. Son bölüm!',
-    win: 'Franchise Baronu devrildi. Tabelalar sönüyor...' }
+  { name: 'Franchise Baronu', quota: 18, rivals: ['barista', 'queue', 'croc', 'baron', 'kargo', 'teyze'], rivalName: 'Franchise Baronu ve Çetesi',
+    intro: 'Franchise Baronu zam etiketleri yağdırıyor, çetesi fincan fırlatıyor, kuyruk dolanıyor, timsah bomba atıyor. Bu kez gerçekten sert!',
+    win: 'Franchise Baronu devrildi. Tabelalar sönüyor... ama uzaktan bir motor sesi geliyor.' },
+  { name: 'Çöl Otoyolu', quota: 16, rivals: ['dolmus','kargo','cat'], rivalName: 'Dolmuş + Kargo + Kedi',
+    intro: 'Yeni bir bölge: Nevada İmparatorluğu! Otoyolda dolmuşlar şerit değiştiriyor, kuryeler paket bırakıyor, kedi matchanı kapıyor.',
+    win: 'Dolmuş şoförü "son durak" dedi ve kendi durağında indi.' },
+  { name: 'Otogar Kaosu', quota: 17, rivals: ['dolmus','teyze','cat'], rivalName: 'Dolmuş + Poşet Teyze + Kedi',
+    intro: 'Otogarda herkes bir yere gidiyor, kimse varmıyor. Teyzenin poşetine dikkat, şeritlere de!',
+    win: 'Otogarın anonsu: "Matcha yok, ama kurt var."' },
+  { name: 'Kargo Deposu', quota: 18, rivals: ['kargo','kargo','fund'], rivalName: '2 Kargo Kuryesi + Vurgun',
+    intro: 'Depoda iki kurye aynı anda paket bırakıyor. Üstelik bozuk para da yağıyor. Çok yönlü kaos!',
+    win: 'Kuryeler paketleri karıştırdı: herkesin siparişi herkese gitti.' },
+  { name: 'Pazar Yeri', quota: 18, rivals: ['teyze','teyze','cat','drummer'], rivalName: '2 Poşet Teyze + Kedi + Sahurcu',
+    intro: 'Pazarda iki teyze poşet savuruyor, kedi tezgâhtan matcha çalıyor, sahurcu hâlâ sahurda.',
+    win: 'Teyzeler pazarlıkta anlaşamadı, poşetler hâlâ havada.' },
+  { name: 'Mahalle Düğünü', quota: 20, rivals: ['drummer','ballerina','teyze','dolmus'], rivalName: 'Davul + Balerin + Teyze + Dolmuş',
+    intro: 'Düğünde davul çalıyor, balerin dans ediyor, dolmuş gelin arabası olmuş. Hepsi sana doğru.',
+    win: 'Gelin ve damat kaçtı. Matcha kaseleri düğün hediyesi sayıldı.' },
+  { name: 'Gece Seferi', quota: 20, rivals: ['dolmus','dolmus','croc'], rivalName: '2 Dolmuş + Bombardıman Timsahı',
+    intro: 'Gece seferinde iki dolmuş yarışıyor, timsah da bomba atıyor. Şeritleri ve halkaları takip et!',
+    win: 'Dolmuşlar sabaha kadar yarıştı. Kazanan: yakıt tasarrufu.' },
+  { name: 'Hırsız Kediler Çetesi', quota: 20, rivals: ['cat','cat','cat','zam'], rivalName: '3 Kedi + Zam Canavarı',
+    intro: 'Üç kedi aynı anda matcha çalıyor, zam canavarı fiyatları şişiriyor. Hepsini yakala!',
+    win: 'Kediler matchaları geri verdi. Hepsini değil, yarısını.' },
+  { name: 'Kuryeler Grevi', quota: 22, rivals: ['kargo','kargo','queue'], rivalName: '2 Kurye + Kuyruk',
+    intro: 'Kuryeler greve gitti: paketler sadece patlıyor. Kuyruk da grevi görmeye geldi.',
+    win: 'Grev bitti. Paketler hâlâ patlıyor, ama artık sigortalı.' },
+  { name: 'Poşet Fırtınası', quota: 22, rivals: ['teyze','teyze','zam','barista'], rivalName: '2 Teyze + Zam + Barista',
+    intro: 'Poşetler uçuşuyor, latteler yapışıyor, zam etiketleri yağıyor. Hava durumu: karışık.',
+    win: 'Fırtına dindi. Poşetler hâlâ yerde, geri dönüşüm bekleniyor.' },
+  { name: 'Sosyal Medya Fonu', quota: 22, rivals: ['fund','fund','dolmus','cat'], rivalName: '2 Vurgun + Dolmuş + Kedi',
+    intro: 'İki fon yöneticisi para yağdırıyor, kedi "içerik" diye matcha çalıyor, dolmuş reklam arası veriyor.',
+    win: 'Fonlar "sürdürülebilir büyüme" dedi ve gece yarısı kayboldu.' },
+  { name: 'Hız Sınırı Yok', quota: 24, rivals: ['dolmus','dolmus','kargo','teyze'], rivalName: '2 Dolmuş + Kurye + Teyze',
+    intro: 'Hız sınırı yok, şerit yok, mantık yok. Dolmuşlar, paketler ve poşetler aynı anda geliyor.',
+    win: 'Hız sınırı tabelası da şikâyet etti: "Bana da bakan olsun."' },
+  { name: 'Zincir Marketler', quota: 24, rivals: ['queue','teyze','kargo','zam'], rivalName: 'Kuyruk + Teyze + Kurye + Zam',
+    intro: 'Zincir markette kuyruk, poşet, paket ve zam etiketi birleşti. Raflar arasında kaç!',
+    win: 'Market kapandı. Tabela "yakında yeniden açılıyoruz" diyor, her zamanki gibi.' },
+  { name: 'Bayram Alışverişi', quota: 24, rivals: ['dolmus','kargo','cat','teyze','barista'], rivalName: 'Dolmuş + Kurye + Kedi + Teyze + Barista',
+    intro: 'Bayram alışverişi: yeni karakterlerin hepsi tek sokakta. Bu bölüm kalabalıktan bile kalabalık.',
+    win: 'Bayram bitti. Alışveriş sonsuza kadar sürecek.' },
+  { name: 'Neon Gökdelen', quota: 26, rivals: ['baron','dolmus','kargo','cat'], rivalName: 'Baron + Dolmuş + Kurye + Kedi',
+    intro: 'Gökdelenin zirvesinde Baron\'un yeğeni oturuyor. Çevrede dolmuş, kurye ve kedi var. Yukarı doğru kaç!',
+    win: 'Gökdelenin asansörü bozuk. Ama sen zaten merdivenle çıktın.' },
+  { name: 'Final: Nevada İmparatoru', quota: 28, rivals: ['baron','fund','croc','ballerina','dolmus','kargo','cat','teyze'], rivalName: 'İmparator ve Tüm Çete',
+    intro: 'Nevada İmparatoru tahtında: baron, fon, timsah, balerin, dolmuş, kurye, kedi ve teyze hep birlikte. Son bölüm. Bu sefer gerçek!',
+    win: 'İmparator tahtından düştü. Tabelalar bu kez gerçekten söndü.' }
 ];
 
 /* ---------- durum ---------- */
@@ -148,9 +193,24 @@ const THEMES = [
   { sky: ['#ff9a6b', '#ffd2a1'], mt: ['#bf6a48', '#9c5236', '#74402b'], gr: ['#cfa862', '#a8803f'], snow: 0, stars: 0, kind: 'desert' },
   { sky: ['#150a2e', '#5a1d6e'], mt: ['#3a2250', '#2a1840', '#1a0f2e'], gr: ['#4d3a4f', '#2c2030'], snow: 0, stars: 1, kind: 'neon', neon: '#ff4fd8' },
   { sky: ['#0a1a3a', '#1d4f7a'], mt: ['#1f4a5a', '#16384a', '#0e2736'], gr: ['#3d4a4f', '#232e33'], snow: 0, stars: 1, kind: 'neon', neon: '#4dffd0' },
-  { sky: ['#3a0a12', '#c2392b'], mt: ['#5a1d1d', '#3d1010', '#240808'], gr: ['#5b3a2e', '#2e1a14'], snow: 0, stars: 1, kind: 'neon', neon: '#ff3b4d' }
+  { sky: ['#3a0a12', '#c2392b'], mt: ['#5a1d1d', '#3d1010', '#240808'], gr: ['#5b3a2e', '#2e1a14'], snow: 0, stars: 1, kind: 'neon', neon: '#ff3b4d' },
+  { sky: ['#ffd27a', '#fff0c8'], mt: ['#d4895a', '#b06a42', '#85503a'], gr: ['#e0bf7e', '#bb9350'], snow: 0, stars: 0, kind: 'desert' },
+  { sky: ['#2b1f5c', '#7a4aa8'], mt: ['#4a2f6a', '#38204f', '#251538'], gr: ['#463a5a', '#2a2238'], snow: 0, stars: 1, kind: 'neon', neon: '#ffd84a' },
+  { sky: ['#caa57a', '#f0dcc0'], mt: ['#8a6a4a', '#6f5238', '#523c29'], gr: ['#c9a874', '#9d7d4d'], snow: 0, stars: 0, kind: 'desert' },
+  { sky: ['#ffa0b8', '#ffe0cc'], mt: ['#c0707a', '#9a5560', '#733f48'], gr: ['#d8b27c', '#b08a52'], snow: 0, stars: 0, kind: 'desert' },
+  { sky: ['#ff7ac8', '#ffd0ec'], mt: ['#9a4a8a', '#7a3870', '#582856'], gr: ['#4d3a5f', '#2d2238'], snow: 0, stars: 1, kind: 'neon', neon: '#ff7ad9' },
+  { sky: ['#050a22', '#1a3a7a'], mt: ['#1a2f5a', '#122244', '#0a1630'], gr: ['#33415a', '#1c2638'], snow: 0, stars: 1, kind: 'neon', neon: '#6aa8ff' },
+  { sky: ['#7a6a5a', '#c8bfae'], mt: ['#7f8a8f', '#5f6a70', '#454e52'], gr: ['#a8a07a', '#7d7650'], snow: 0, stars: 0, kind: 'desert' },
+  { sky: ['#8a96a8', '#d8dde6'], mt: ['#707a88', '#556070', '#3c4552'], gr: ['#8f9a7a', '#677254'], snow: 1, stars: 0, kind: 'gabar' },
+  { sky: ['#6aa8c8', '#d0ecf8'], mt: ['#5a8aa0', '#436e84', '#2e5266'], gr: ['#5fa060', '#3b7040'], snow: 1, stars: 0, kind: 'gabar' },
+  { sky: ['#1a0a3a', '#7a2a8a'], mt: ['#3d2060', '#2a1544', '#1a0c2e'], gr: ['#4a3358', '#2a1f36'], snow: 0, stars: 1, kind: 'neon', neon: '#b46aff' },
+  { sky: ['#ffb47a', '#ff7a5a'], mt: ['#b4503a', '#8a3a2a', '#602818'], gr: ['#d8a468', '#ac7a3a'], snow: 0, stars: 0, kind: 'desert' },
+  { sky: ['#2a3a3a', '#7aa8a0'], mt: ['#3a5a5a', '#2c4646', '#1e3232'], gr: ['#4a6a60', '#2c4440'], snow: 0, stars: 0, kind: 'neon', neon: '#4dffa0' },
+  { sky: ['#ff9ab8', '#ffe8a8'], mt: ['#d08a60', '#a86a48', '#7c4e34'], gr: ['#e4c488', '#bc9858'], snow: 0, stars: 0, kind: 'desert' },
+  { sky: ['#0a0a1a', '#3a1a5a'], mt: ['#201a40', '#161232', '#0c0a22'], gr: ['#2f2a44', '#1a1828'], snow: 0, stars: 1, kind: 'neon', neon: '#ff4d6a' },
+  { sky: ['#12020a', '#8a0f2a'], mt: ['#4a0f1a', '#32080f', '#1c0408'], gr: ['#4a2a2e', '#261418'], snow: 0, stars: 1, kind: 'neon', neon: '#ffd84a' }
 ];
-const CAFES = [1, 2, 3, 4, 6, 8, 11, 14, 17, 20, 24, 28];
+const CAFES = [1, 2, 3, 4, 6, 8, 11, 14, 17, 20, 24, 28, 22, 24, 22, 20, 26, 24, 22, 20, 18, 24, 26, 28, 26, 30, 34];
 function cafe(g, x, y, sc, neon, tag) {
   g.save(); g.translate(x, y); g.scale(sc, sc);
   if (neon) { g.shadowColor = neon; g.shadowBlur = 9; }
@@ -209,8 +269,8 @@ function makeBG(level) {
   vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.35)'); g.fillStyle = vg; g.fillRect(0, 0, WW, WH);
   return c;
 }
-const bgs = [];
-function getBG(i) { return bgs[i] || (bgs[i] = makeBG(i)); }
+const bgs = new Map();
+function getBG(i) { let c = bgs.get(i); if (!c) { c = makeBG(i); bgs.set(i, c); if (bgs.size > 3) { const k0 = bgs.keys().next().value; bgs.delete(k0); } } else { bgs.delete(i); bgs.set(i, c); } return c; }
 
 /* ---------- bölüm başlat ---------- */
 function startLevel(i) {
@@ -251,7 +311,7 @@ function spawnMatcha(gold) {
 }
 
 /* ---------- oynanış ---------- */
-function burst(x, y, col, n) { for (let i = 0; i < n; i++) { const a = Math.random() * 6.28, s = rand(40, 200); parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(.3, .8), max: .8, col, r: rand(2, 5) }); } }
+function burst(x, y, col, n) { if (LITE) n = Math.ceil(n / 2); if (parts.length > 160) return; for (let i = 0; i < n; i++) { const a = Math.random() * 6.28, s = rand(40, 200); parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(.3, .8), max: .8, col, r: rand(2, 5) }); } }
 function popup(s, x, y, col) { popups.push({ s, x, y, life: 1, col: col || '#fff' }); }
 function hurt(w) {
   w = w || wolf; if (w.inv > 0 || scene !== 'play') return;
@@ -292,7 +352,7 @@ function stepWolf(wolf, vx, vy, dt) {
   if (vx > .1) wolf.face = 1; else if (vx < -.1) wolf.face = -1;
   wolf.x = clamp(wolf.x, 24, WW - 24); wolf.y = clamp(wolf.y, FIELD_TOP, FIELD_BOT);
   for (const o of rocks) { const d = dist(wolf, o), m = o.r + wolf.r - 4; if (d < m && d > 0) { wolf.x = o.x + (wolf.x - o.x) / d * m; wolf.y = o.y + (wolf.y - o.y) / d * m; } }
-  { const sk0 = WOLF_SKINS[wolf.skin]; if (sk0.trail && (vx || vy) && Math.random() < dt * 28) parts.push({ x: wolf.x - vx * 10 + rand(-5, 5), y: wolf.y + 8 + rand(-3, 3), vx: rand(-12, 12), vy: rand(-26, -6), life: .55, max: .55, col: sk0.trail, ch: sk0.te, r: sk0.te ? rand(2.4, 3.4) : rand(1.5, 3.2) }); }
+  { const sk0 = WOLF_SKINS[wolf.skin]; if (!LITE && sk0.trail && (vx || vy) && Math.random() < dt * 28) parts.push({ x: wolf.x - vx * 10 + rand(-5, 5), y: wolf.y + 8 + rand(-3, 3), vx: rand(-12, 12), vy: rand(-26, -6), life: .55, max: .55, col: sk0.trail, ch: sk0.te, r: sk0.te ? rand(2.4, 3.4) : rand(1.5, 3.2) }); }
   if (wolf.energyT > 0) { wolf.energyT = Math.max(0, wolf.energyT - dt / 6.5); if (wolf.energyT > .12) wolf.trail.push({ x: wolf.x, y: wolf.y, l: .3 }); }
   if (wolf.drinkT > 0) wolf.drinkT -= dt;
   wolf.trail.forEach(p => p.l -= dt); wolf.trail = wolf.trail.filter(p => p.l > 0);
@@ -313,7 +373,7 @@ function update(dt) {
         m.gold ? sfx.gold() : sfx.pick();
         if (got >= lv.quota && !princess) {
           let px = wolf.x < WW / 2 ? WW - 100 : 100, py = wolf.y < WH / 2 ? WH - 80 : FIELD_TOP + 70;
-          princess = { x: px, y: py, t: 0 }; popup('Prenses göründü!', wolf.x, wolf.y - 70, '#ffe08a'); sfx.win(); burst(px, py, '#ffe08a', 40);
+          rocks = rocks.filter(r => dist(r, { x: px, y: py }) > (r.r || 24) + 70); princess = { x: px, y: py, t: 0 }; popup('Prenses göründü!', wolf.x, wolf.y - 70, '#ffe08a'); sfx.win(); burst(px, py, '#ffe08a', 40);
           matchas.length = 0; break;
         }
       }
@@ -323,7 +383,7 @@ function update(dt) {
   if (princess) { princess.t += dt; if (players.some(P => P.on && dist(princess, P) < 40)) { score += lives * 200; winMsg = pick(MEME_WIN); scene = 'cleared'; sfx.win(); burst(princess.x, princess.y, '#ffd84a', 60); if (L + 1 > progress) { progress = Math.min(L + 1, LEVELS.length - 1); saveProg(); } setBtns(); } }
 
   // rakipler
-  const lvf = 1 + L * .06;
+  const lvf = 1 + Math.min(L, 11) * .06 + Math.max(0, L - 11) * .012;
   for (const e of rivals) {
     e.t += dt; const wolf = nearest(e);
     if (e.type === 'drummer') {
@@ -504,7 +564,17 @@ function princessSprite(px, py, t, sk, sc, label) {
   if (label) txt('PRENSES', x, y - 52, 15, '#ffe9a8');
   ctx.restore();
 }
-function emoji(ch, x, y, size) { ctx.font = size + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff'; ctx.fillText(ch, x, y); }
+let LITE = false, fpsAcc = 0, fpsN = 0;
+const EMO = new Map();
+function emoji(ch, x, y, size) {
+  const sz = Math.max(6, Math.round(size)), key = ch + sz; let c = EMO.get(key);
+  if (!c) {
+    const d = Math.ceil(sz * 1.5); c = document.createElement('canvas'); c.width = c.height = d; const g = c.getContext('2d');
+    g.font = sz + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#fff'; g.fillText(ch, d / 2, d / 2 + sz * .04);
+    if (EMO.size > 600) EMO.clear(); EMO.set(key, c);
+  }
+  ctx.drawImage(c, x - c.width / 2, y - c.height / 2);
+}
 function drawQueue(e) {
   const faces = ['🧍', '🧍‍♀️', '🧍‍♂️'];
   for (let k = 9; k >= 0; k--) { const sg = e.hist[Math.max(0, e.hist.length - 1 - k * 22)]; shadow(sg.x, sg.y, 14); emoji(faces[k % 3], sg.x, sg.y, 34); }
@@ -621,7 +691,7 @@ const WHO = {
   zam: { n: 'Zam Canavarı', c: '#ff6b6b', e: '🏷️' }, mafya: { n: 'Matcha Mafyası', c: '#b9bcc6', e: '🕶️' },
   dolmus: { n: 'Dolmuş Şoförü', c: '#ffcf6b', e: '🚐' }, kargo: { n: 'Kargo Kuryesi', c: '#c9a06a', e: '🚚' }, cat: { n: 'Hırsız Kedi', c: '#ffd9a0', e: '🐈' }, teyze: { n: 'Poşet Teyze', c: '#e6a0d0', e: '👵' },
   barista: { n: 'Stajyer Barista', c: '#d9a066', e: '☕' }, queue: { n: 'Kuyruktaki Adam', c: '#cfd6e2', e: '🧍' },
-  baron: { n: 'Franchise Baronu', c: '#ff5d73', e: '🕴️' }
+  baron: { n: 'Franchise Baronu', c: '#ff5d73', e: '🕴️' }, imp: { n: 'Nevada İmparatoru', c: '#ffd84a', e: '👑' }
 };
 const STORY = {
   pre: {
@@ -736,12 +806,107 @@ const STORY = {
       ['baron', 'Sen matcha topluyorsun, ben şube topluyorum. Kimin işi daha anlamsız?'],
       ['wolf', 'İkimizinki de.'],
       ['baron', '...Haklısın. Ama yine de savaşalım.'],
-      ['narr', 'Ve böylece son bölüm başladı. Ödenek yine çıkmadı.']
+      ['narr', 'Ve böylece son bölüm başladı. (Öyle sandık. Ödenek yine çıkmadı.)']
+    ],
+    12: [
+      ['narr', 'Baron devrildi. Tabelalar söndü. Ama dağın ardından bir motor sesi geldi, sonra bir korna, sonra bir anons.'],
+      ['dolmus', 'Müsait yer var abi! Nevada İmparatorluğu\'na hoş geldin, Baron burada sadece bölge müdürüydü.'],
+      ['wolf', 'İmparatorluk mu? Ben sadece matcha topluyordum.'],
+      ['prin', 'Kurt, bu hikâye 12 bölümde bitmeyecek. İmparatorun yeni karakterleri var: dolmuş, kurye, kedi, teyze. Hepsi tek sokakta.'],
+      ['narr', 'Bütçe bu sefer 15 bölüm daha çıkarmış. Kaynağı sorulmamıştır.']
+    ],
+    13: [
+      ['narr', 'Otogarın anons sistemi sürekli aynı cümleyi tekrar ediyordu.'],
+      ['dolmus', 'Dört kişi daha binerse kalkıyoruz. (Dört kişi bineli üç saat oldu.)'],
+      ['teyze', 'Oğlum, poşetim burada bir yerde. Sen gördün mü?'],
+      ['wolf', 'Poşetin sana geri geliyor teyze.'],
+      ['teyze', 'Evet. Tam da bu yüzden hep o yüzden saklıyorum.']
+    ],
+    14: [
+      ['kargo', 'Kapıda ödeme! Ama bu sefer iki kişiyiz.'],
+      ['kargo', 'Biz de kimin paketi hangisi bilmiyoruz.'],
+      ['wolf', 'Hepsi patlıyor zaten.'],
+      ['prin', 'İşte bu yüzden sigortası yok.']
+    ],
+    15: [
+      ['narr', 'Pazar yeri. Her tezgâhta bir kasa matcha, her kasada bir pazarlık.'],
+      ['teyze', 'Bir matcha kaçtan? Bu kadar mı? Bir de bana poşet versene.'],
+      ['cat', 'Miyav. (Tercüme: Tezgâh bana emanet.)'],
+      ['drum', 'Pazarda sahur olmaz mı? Olur, olur.']
+    ],
+    16: [
+      ['narr', 'Bir düğün. Davul, zurna, balerin ve ekstra olarak bir dolmuş.'],
+      ['ball', 'Bu düğünde piruet yok mu? Olacak.'],
+      ['dolmus', 'Gelin arabası benim, ama müşteri alıyorum.'],
+      ['prin', 'Düğünde dans etmek yok kurt, kaçacağız!']
+    ],
+    17: [
+      ['narr', 'Gece sefer. Yol boş, neon yanıyor, iki dolmuş yan yana.'],
+      ['dolmus', 'Önce ben geçerim.'],
+      ['dolmus', 'Hayır ben.'],
+      ['croc', 'Ben de bomba atıyorum, dikkatinize.']
+    ],
+    18: [
+      ['narr', 'Çölün ortasında üç kedi bir çember çizip oturmuştu. Ortada bir kase matcha vardı. Çoktan boş.'],
+      ['cat', 'Miyav.'],
+      ['cat', 'Miyav miyav.'],
+      ['wolf', 'Bunları kimse çevirmiyor mu?'],
+      ['prin', 'Çeviriyorum: "Hepsi bizim." Kediler matchayı geri verir kurt, yakala!']
+    ],
+    19: [
+      ['kargo', 'Biz greve gidiyoruz! Paketleri teslim etmiyoruz, sadece bırakıyoruz.'],
+      ['queue', 'Ben greve katılmadım. Sıradayım.'],
+      ['wolf', 'Herkes bir şeyin sırasında.'],
+      ['prin', 'Ve o sıra asla ilerlemiyor.']
+    ],
+    20: [
+      ['narr', 'Poşet fırtınası bir iklim olayı değildir. Bir mahalle olayıdır.'],
+      ['teyze', 'Bir poşet daha mı lazım?'],
+      ['zam', 'Poşet de artık ücretli.'],
+      ['barista', 'Lattemizi poşetle servis ediyoruz.']
+    ],
+    21: [
+      ['fund', 'Yeni fonumuz: Kurt Matcha Fonu. Getirisi garantili: matcha yok, ama getiri var.'],
+      ['cat', 'Miyav. (Tercüme: Fona ortak oldum.)'],
+      ['dolmus', 'Reklam arası. Herkes ineceğiz.'],
+      ['wolf', 'Buna reklam arası denmez, buna tuzak denir.']
+    ],
+    22: [
+      ['narr', 'Burada hız sınırı yok. Çünkü sınır tabelasını dolmuş götürdü.'],
+      ['dolmus', 'Bu sefer iki tur!'],
+      ['teyze', 'Beni de al oğlum, poşetler hazır.'],
+      ['kargo', 'Ben şahsen sadece paket bırakıyorum.']
+    ],
+    23: [
+      ['narr', 'Zincir markette her rafta bir kuyruk, her kuyrukta bir zam.'],
+      ['zam', 'Bu ürün yarın bir kuruş daha pahalı olacak.'],
+      ['queue', 'Ben dünden beri bu kasadayım.'],
+      ['kargo', 'Ben kapıda ödemeliyim. Kimsenin kapısı yok.']
+    ],
+    24: [
+      ['narr', 'Bayram yaklaşıyor. Her karakter alışverişte. Hiçbiri indirimli bir şey bulamıyor.'],
+      ['barista', 'Bayram boyu bir latte alana bir latte daha. (İkincisi daha pahalı.)'],
+      ['dolmus', 'Bayram seferleri başladı!'],
+      ['prin', 'Bu kalabalıktan çıkmak için ya hızlı ol, ya matcha iç. Ya da ikisi.']
+    ],
+    25: [
+      ['narr', 'Çölün ortasında yükselen bir gökdelen. Tepesinde neon bir tabela: "NEVADA KAHVE - İMPARATORLUK KATI".'],
+      ['baron', 'Baronun yeğeniyim ama aynı ceketi giyiyoruz. Bu yüzden herkes karıştırıyor.'],
+      ['wolf', 'Merdiven mi asansör mü?'],
+      ['baron', 'Her ikisi de ücretli.']
+    ],
+    26: [
+      ['narr', 'Tahtın önünde bütün karakterler toplandı. Hepsi aynı anda konuşuyor, kimse dinlemiyor. Hikâyenin gerçek finali bu.'],
+      ['imp', 'Ben Nevada İmparatoruyum. Her şubenin tepesi, her kuyruğun sonu, her fincanın dibi bendedir.'],
+      ['wolf', 'Ben sadece matcha topladım.'],
+      ['imp', 'İşte bu yüzden tehlikelisin. Matcha toplayanlar bir gün şubeleri kapatır.'],
+      ['prin', 'Kurt, bütün rakipleri biliyorsun. Hepsini atlat, bana ulaş!'],
+      ['narr', 'Ve böylece gerçek son bölüm başladı. Bu sefer ödenek çıktı. Hâlâ nereden olduğunu bilmiyoruz.']
     ]
   },
   epilogue: [
-    ['narr', 'Baron yere düştü. Tabelalar birer birer söndü. Dağlarda yalnızca yıldızlar ve rüzgar kaldı.'],
-    ['baron', 'Bu hiç adil değil. Bende yeni bir kampanya vardı.'],
+    ['narr', 'İmparator tahtından düştü. Tabelalar birer birer söndü. Dolmuşlar durdu, kediler uyudu, kuryeler paketleri geri aldı. Dağlarda yalnızca yıldızlar ve rüzgar kaldı.'],
+    ['imp', 'Bu hiç adil değil. Bende yeni bir kampanya vardı.'],
     ['prin', 'Kurt, gerçekten kurtardın beni. Ama kule artık boş. Şimdi ne yapacağız?'],
     ['wolf', 'Matcha demleyelim.'],
     ['prin', 'Soğumuş olur.'],
@@ -985,22 +1150,24 @@ function applySnap(d) {
   d.w.forEach((q, i) => {
     const P = players[i]; if (!P) return; P.on = !!q.o; P.skin = q.k; P.stock = q.st; P.energyT = q.e; P.drinkT = q.dr; P.inv = q.iv;
     if (P === wolf) { const ex = q.x - P.x, ey = q.y - P.y, er = Math.hypot(ex, ey); if (er > 70) { P.x = q.x; P.y = q.y; } else if (er > 35) { P.x += ex * .25; P.y += ey * .25; } }
-    else { P.face = q.f; P.tx = q.x; P.ty = q.y; if (P.x === undefined || Math.hypot(P.x - q.x, P.y - q.y) > 150) { P.x = q.x; P.y = q.y; } }
+    else { P.face = q.f; const nw = performance.now(), ds = (nw - (P.qt || 0)) / 1000; if (P.tx !== undefined && ds > .005 && ds < .5 && Math.hypot(q.x - P.tx, q.y - P.ty) < 120) { P.vx2 = (q.x - P.tx) / ds; P.vy2 = (q.y - P.ty) / ds; } else { P.vx2 = 0; P.vy2 = 0; } P.qt = nw; P.tx = q.x; P.ty = q.y; if (P.x === undefined || Math.hypot(P.x - q.x, P.y - q.y) > 150) { P.x = q.x; P.y = q.y; } }
   });
   matchas = d.m.map(a => ({ x: a[0], y: a[1], gold: !!a[2], ph: a[3], r: 15 }));
   d.r.forEach((q, i) => {
     const e = rivals[i]; if (!e) return; e.t = q.t; e.st = q.st; e.tele = q.tele; e.lane = q.ln; e.vx = q.vx; e.vy = q.vy; e.carry = !!q.cr; e.stun = q.sn;
     if (q.sg) { const hs = new Array(221); for (let k = 0; k < 221; k++) hs[k] = { x: q.sg[9][0], y: q.sg[9][1] }; for (let k = 0; k < 10; k++) hs[220 - k * 22] = { x: q.sg[k][0], y: q.sg[k][1] }; e.hist = hs; e.x = q.x; e.y = q.y; }
-    else { e.qx = q.x; e.qy = q.y; if (Math.hypot(e.x - q.x, e.y - q.y) > 150) { e.x = q.x; e.y = q.y; } }
+    else { const nw = performance.now(), ds = (nw - (e.qt || 0)) / 1000; if (e.qx !== undefined && ds > .005 && ds < .5 && Math.hypot(q.x - e.qx, q.y - e.qy) < 120) { e.v2x = (q.x - e.qx) / ds; e.v2y = (q.y - e.qy) / ds; } else { e.v2x = 0; e.v2y = 0; } e.qt = nw; e.qx = q.x; e.qy = q.y; if (Math.hypot(e.x - q.x, e.y - q.y) > 150) { e.x = q.x; e.y = q.y; } }
   });
-  hazards = d.h; princess = d.p;
+  hazards = d.h; princess = d.p; if (princess) princess._r = 1;
   applyEv(d.ev || []);
 }
 function guestUpdate(dt) {
   time += dt; if (shake > 0) shake -= dt;
   const [vx, vy] = inputVec(); stepWolf(wolf, vx, vy, dt);
-  for (const P of players) if (P.on && P !== wolf && P.tx !== undefined) { P.x += (P.tx - P.x) * .35; P.y += (P.ty - P.y) * .35; P.moving = Math.hypot(P.tx - P.x, P.ty - P.y) > 2; }
-  for (const e of rivals) if (e.qx !== undefined) { e.x += (e.qx - e.x) * .5; e.y += (e.qy - e.y) * .5; }
+  const nw = performance.now(), k = 1 - Math.exp(-16 * dt);
+  for (const P of players) if (P.on && P !== wolf && P.tx !== undefined) { const ex = Math.min(.16, (nw - P.qt) / 1000), gx = P.tx + (P.vx2 || 0) * ex, gy = P.ty + (P.vy2 || 0) * ex; P.x += (gx - P.x) * k; P.y += (gy - P.y) * k; P.moving = Math.hypot(gx - P.x, gy - P.y) > 2 || Math.hypot(P.vx2 || 0, P.vy2 || 0) > 20; }
+  for (const e of rivals) if (e.qx !== undefined) { const ex = Math.min(.16, (nw - e.qt) / 1000), gx = e.qx + (e.v2x || 0) * ex, gy = e.qy + (e.v2y || 0) * ex; e.x += (gx - e.x) * k; e.y += (gy - e.y) * k; }
+  for (const h of hazards) { if (typeof h.t === 'number') { h.t += dt; if (h.k === 'bag' && h.t < .95) { const q = h.t / .95; h.x = h.sx + (h.tx - h.sx) * q; h.y = h.sy + (h.ty - h.sy) * q; } } else if (typeof h.life === 'number') { h.life -= dt; if (h.k === 'coin') { h.x += h.vx * dt; h.y += h.vy * dt; } } }
   parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .93; p.vy *= .93; p.life -= dt; }); parts = parts.filter(p => p.life > 0);
   popups.forEach(p => { p.y -= 34 * dt; p.life -= dt; }); popups = popups.filter(p => p.life > 0);
 }
@@ -1191,7 +1358,7 @@ function drawCleared() { ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(0, 0, W,
 function drawFinal() {
   ctx.drawImage(getBG(LEVELS.length - 1), 0, 0, W, H); ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(0, 0, W, H); panel(100, 60, 760, 440);
   emoji('🏆', W / 2, 125, 70); txt('GABAR ÖZGÜR!', W / 2, 205, 66, '#ffe08a', 'center', '900');
-  wrap('Franchise Baronu devrildi, tabelalar söndü. Kurt matcha demledi, prenses tahtını geri aldı. Şubelerin yarısı sezonluk diye açık kaldı. Dağlarda artık rüzgar ve soğuk matcha kokusu var.', W / 2, 268, 660, 32, 22, '#e8f3ea', 'center');
+  wrap('Nevada İmparatoru devrildi, tabelalar söndü. Kurt matcha demledi, prenses tahtını geri aldı. Şubelerin yarısı sezonluk diye açık kaldı. Dağlarda artık rüzgar ve soğuk matcha kokusu var.', W / 2, 268, 660, 32, 22, '#e8f3ea', 'center');
   txt('Toplam Aura: ' + score, W / 2, 425, 40, '#9be36b');
 }
 function drawSkins() {
@@ -1213,16 +1380,16 @@ function draw() {
   else {
     if (shake > 0) ctx.translate(rand(-5, 5) * shake * 3, rand(-5, 5) * shake * 3);
     updateCam(); ctx.translate(-cam.x, -cam.y);
-    ctx.drawImage(bgCache, 0, 0);
-    const objs = [];
-    rocks.forEach(o => objs.push([o.y, () => drawRock(o)]));
-    matchas.forEach(m => objs.push([m.y, () => drawMatcha(m)]));
+    ctx.drawImage(bgCache, cam.x, cam.y, W, H, cam.x, cam.y, W, H);
+    const objs = [], vx0 = cam.x - 90, vx1 = cam.x + W + 90, vy0 = cam.y - 90, vy1 = cam.y + H + 90, vis = o => o.x > vx0 && o.x < vx1 && o.y > vy0 && o.y < vy1;
+    rocks.forEach(o => { if (vis(o)) objs.push([o.y, () => drawRock(o)]); });
+    matchas.forEach(m => { if (vis(m)) objs.push([m.y, () => drawMatcha(m)]); });
     if (princess) objs.push([princess.y, () => drawPrincess(princess)]);
-    rivals.forEach(e => objs.push([e.y, () => drawRival(e)]));
+    rivals.forEach(e => { if (e.type === 'queue' || e.type === 'dolmus' || vis(e)) objs.push([e.y, () => drawRival(e)]); });
     players.forEach(P => { if (P.on) objs.push([P.y, () => drawWolf(P)]); });
     objs.sort((a, b) => a[0] - b[0]).forEach(o => o[1]());
     drawHazards();
-    parts.forEach(p => { ctx.globalAlpha = Math.max(0, p.life / p.max); if (p.ch) emoji(p.ch, p.x, p.y, p.r * 7); else { ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); } }); ctx.globalAlpha = 1;
+    parts.forEach(p => { if (!vis(p)) return; ctx.globalAlpha = Math.max(0, p.life / p.max); if (p.ch) emoji(p.ch, p.x, p.y, p.r * 7); else { ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); } }); ctx.globalAlpha = 1;
     popups.forEach(p => { ctx.globalAlpha = Math.min(1, p.life * 1.5); txt(p.s, p.x, p.y, 24, p.col); }); ctx.globalAlpha = 1;
     ctx.restore(); ctx.save();
     drawPunch();
@@ -1270,7 +1437,8 @@ window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; }
 /* ---------- döngü ---------- */
 let last = performance.now();
 function loop(now) {
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  const rdt = (now - last) / 1000; const dt = Math.min(.05, rdt); last = now;
+  if (rdt > 0 && rdt < 1) { fpsAcc += rdt; fpsN++; if (fpsAcc > 2) { const f = fpsN / fpsAcc; if (f < 38 && !LITE) LITE = true; else if (f > 56 && LITE && fpsAcc > 6) LITE = false; fpsAcc = 0; fpsN = 0; } }
   if (scene === 'cut' && cut) { const ln = cut.lines[cut.i]; if (cut.c < ln[1].length) { const before = Math.floor(cut.c / 3); cut.c = Math.min(ln[1].length, cut.c + dt * 48); if (Math.floor(cut.c / 3) !== before && ln[0] !== 'narr') beep(ln[0] === 'wolf' ? 210 : 330 + (ln[0].length * 17) % 120, .03, 'square', .02); } }
   if (punch) { punch.t += dt; if (punch.t > .95) punch = null; }
   try {
