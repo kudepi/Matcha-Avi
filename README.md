@@ -30,3 +30,4 @@ halka açık olduğu için oda kodunu sadece arkadaşınla paylaş. Okul ağı h
 - Büyük harita (1600×1000) + kamera takibi + mini harita
 - Yeni rakipler: Dolmuş Şoförü (kırmızı şeritte hasar), Kargo Kuryesi (patlayan paketler), Hırsız Kedi (matcha çalar, yakalarsan geri verir), Poşet Teyze (giden-gelen poşet)
 - Matcha enerjisi zamanla azalır (yaklaşık 6 sn); ne kadar enerji varsa o kadar hız ve mıknatıs
+https://matcha-avi.streamlit.app/
