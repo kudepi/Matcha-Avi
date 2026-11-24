@@ -164,10 +164,35 @@ const LEVELS = [
   { name: 'Neon Gökdelen', quota: 26, rivals: ['baron','dolmus','kargo','cat'], rivalName: 'Baron + Dolmuş + Kurye + Kedi',
     intro: 'Gökdelenin zirvesinde Baron\'un yeğeni oturuyor. Çevrede dolmuş, kurye ve kedi var. Yukarı doğru kaç!',
     win: 'Gökdelenin asansörü bozuk. Ama sen zaten merdivenle çıktın.' },
-  { name: 'Final: Nevada İmparatoru', quota: 28, rivals: ['baron','fund','croc','ballerina','dolmus','kargo','cat','teyze'], rivalName: 'İmparator ve Tüm Çete',
+  { name: 'Dron Sürüsü', quota: 22, rivals: ['drone','drone','kargo','cat'], rivalName: '2 Dron + Kurye + Kedi',
+    intro: 'Metropolün gökyüzü dronlarla dolu. Dron kırmızı çizgiyi çekince hemen yana kaç, çünkü bir saniye sonra o çizgide uçuyor!',
+    win: 'Dronların bataryası bitti. Kurye "kargo takipte" diye yazdı, kimse takip etmedi.' },
+  { name: 'İnşaat Alanı', quota: 22, rivals: ['crane','crane','dolmus','teyze'], rivalName: '2 Vinç Operatörü + Dolmuş + Teyze',
+    intro: 'İki vinç sıra sıra tuğla bırakıyor. Düşen tuğlaların hepsi aynı doğrultuda, sıra bitmeden yana çık!',
+    win: 'Vinçler "hafta sonu mesaisi" diyerek sustu. Tuğlalar hâlâ yerde.' },
+  { name: 'Kasa Robotları', quota: 24, rivals: ['robot','robot','fund','drone'], rivalName: '2 Kasa Robotu + Vurgun + Dron',
+    intro: 'Robotlar halka dalgaları yayıyor, fon para yağdırıyor, dron çizgi çekiyor. Dalgaların arasından zıpla!',
+    win: 'Robotlar "ödeme alınamadı" diyerek kapandı. Hata kodu: 404 matcha.' },
+  { name: 'Fatura Günü', quota: 24, rivals: ['ghost','ghost','zam','cat','kargo'], rivalName: '2 Fatura Hayaleti + Zam + Kedi + Kurye',
+    intro: 'Hayaletler soluklaşıp peşine düşüyor. Soluk olunca daha hızlılar, uzak dur! Zam etiketi de var.',
+    win: 'Hayaletler faturayı ödedi ve dinlendi. Kimse bu kısmı anlamadı.' },
+  { name: 'Gece Vardiyası', quota: 26, rivals: ['robot','ghost','drone','crane','dolmus'], rivalName: 'Robot + Hayalet + Dron + Vinç + Dolmuş',
+    intro: 'Metropol gece vardiyasında: her yeni karakter bir arada. Dron çizgisi, vinç tuğlası, robot halkası, hayalet soluğu ve dolmuş şeridi!',
+    win: 'Vardiya bitti. Ama mesai kartı hâlâ basılı.' },
+  { name: 'Metropol Trafiği', quota: 26, rivals: ['dolmus','dolmus','drone','drone','kargo','teyze'], rivalName: '2 Dolmuş + 2 Dron + Kurye + Teyze',
+    intro: 'Yerde dolmuş şeritleri, havada dron çizgileri. İki boyutlu trafik: kaç, kaç, kaç!',
+    win: 'Trafik açıldı. Hepsi aynı anda. Kornalar hâlâ çalıyor.' },
+  { name: 'Yönetim Kurulu', quota: 28, rivals: ['baron','robot','ghost','crane','drone','fund'], rivalName: 'Baron + Robot + Hayalet + Vinç + Dron + Vurgun',
+    intro: 'Yönetim kurulu toplantısı: baron tabelaları, robot halkaları, hayalet soluğu, vinç tuğlası, dron çizgisi ve para yağmuru. Toplantı uzun sürecek.',
+    win: 'Toplantı "bir sonrakine bırakıldı". İmparator tahtına dönüyor.' },
+  { name: 'Final: Nevada İmparatoru', quota: 30, rivals: ['baron', 'fund', 'ballerina', 'dolmus', 'kargo', 'cat', 'teyze', 'drone', 'crane', 'robot', 'ghost'], rivalName: 'İmparator ve Tüm Çete',
     intro: 'Nevada İmparatoru tahtında: baron, fon, timsah, balerin, dolmuş, kurye, kedi ve teyze hep birlikte. Son bölüm. Bu sefer gerçek!',
     win: 'İmparator tahtından düştü. Tabelalar bu kez gerçekten söndü.' }
 ];
+
+function Q() { const q = LEVELS[L].quota; return Math.round(q * (1 + .22 * (Math.max(1, players.length) - 1))); }
+const CHAPTERS = [{ from: 0, name: 'Gabar Dağları' }, { from: 7, name: 'Nevada Çölü' }, { from: 21, name: 'Nevada Metropolü' }];
+function chapterOf(i) { let c = 0; CHAPTERS.forEach((ch, k) => { if (i >= ch.from) c = k; }); return c; }
 
 /* ---------- durum ---------- */
 let scene = 'menu', btns = [], t0 = 0, time = 0;
@@ -201,16 +226,23 @@ const THEMES = [
   { sky: ['#ff7ac8', '#ffd0ec'], mt: ['#9a4a8a', '#7a3870', '#582856'], gr: ['#4d3a5f', '#2d2238'], snow: 0, stars: 1, kind: 'neon', neon: '#ff7ad9' },
   { sky: ['#050a22', '#1a3a7a'], mt: ['#1a2f5a', '#122244', '#0a1630'], gr: ['#33415a', '#1c2638'], snow: 0, stars: 1, kind: 'neon', neon: '#6aa8ff' },
   { sky: ['#7a6a5a', '#c8bfae'], mt: ['#7f8a8f', '#5f6a70', '#454e52'], gr: ['#a8a07a', '#7d7650'], snow: 0, stars: 0, kind: 'desert' },
-  { sky: ['#8a96a8', '#d8dde6'], mt: ['#707a88', '#556070', '#3c4552'], gr: ['#8f9a7a', '#677254'], snow: 1, stars: 0, kind: 'gabar' },
-  { sky: ['#6aa8c8', '#d0ecf8'], mt: ['#5a8aa0', '#436e84', '#2e5266'], gr: ['#5fa060', '#3b7040'], snow: 1, stars: 0, kind: 'gabar' },
-  { sky: ['#1a0a3a', '#7a2a8a'], mt: ['#3d2060', '#2a1544', '#1a0c2e'], gr: ['#4a3358', '#2a1f36'], snow: 0, stars: 1, kind: 'neon', neon: '#b46aff' },
-  { sky: ['#ffb47a', '#ff7a5a'], mt: ['#b4503a', '#8a3a2a', '#602818'], gr: ['#d8a468', '#ac7a3a'], snow: 0, stars: 0, kind: 'desert' },
-  { sky: ['#2a3a3a', '#7aa8a0'], mt: ['#3a5a5a', '#2c4646', '#1e3232'], gr: ['#4a6a60', '#2c4440'], snow: 0, stars: 0, kind: 'neon', neon: '#4dffa0' },
-  { sky: ['#ff9ab8', '#ffe8a8'], mt: ['#d08a60', '#a86a48', '#7c4e34'], gr: ['#e4c488', '#bc9858'], snow: 0, stars: 0, kind: 'desert' },
-  { sky: ['#0a0a1a', '#3a1a5a'], mt: ['#201a40', '#161232', '#0c0a22'], gr: ['#2f2a44', '#1a1828'], snow: 0, stars: 1, kind: 'neon', neon: '#ff4d6a' },
-  { sky: ['#12020a', '#8a0f2a'], mt: ['#4a0f1a', '#32080f', '#1c0408'], gr: ['#4a2a2e', '#261418'], snow: 0, stars: 1, kind: 'neon', neon: '#ffd84a' }
+  { sky: ['#ffb47a', '#ffe0b0'], mt: ['#b4703a', '#8a5a2a', '#604018'], gr: ['#d8b468', '#ac8a3a'], snow: 0, stars: 0, kind: 'desert' },
+  { sky: ['#6a3a7a', '#ff9a6a'], mt: ['#8a4a50', '#6a3a40', '#482830'], gr: ['#c9a068', '#9d7a40'], snow: 0, stars: 1, kind: 'desert' },
+  { sky: ['#1b2350', '#c46a8a'], mt: ['#3a3f6a', '#2a2f55', '#1d2140'], gr: ['#3b3f4f', '#23262f'], snow: 0, stars: 1, kind: 'city', neon: '#ff7ad9' },
+  { sky: ['#101a40', '#3a5a9a'], mt: ['#2c3a6a', '#1f2a50', '#151d3a'], gr: ['#343a4a', '#1e222c'], snow: 0, stars: 1, kind: 'city', neon: '#6aa8ff' },
+  { sky: ['#2a1040', '#8a3a7a'], mt: ['#43285f', '#321d49', '#231435'], gr: ['#3a3446', '#221e2a'], snow: 0, stars: 1, kind: 'city', neon: '#ffd84a' },
+  { sky: ['#0a2a3a', '#2a8a9a'], mt: ['#1f4a5a', '#16384a', '#0e2736'], gr: ['#33424a', '#1c262c'], snow: 0, stars: 1, kind: 'city', neon: '#4dffd0' },
+  { sky: ['#3a1a1a', '#c46a3a'], mt: ['#5a2a2a', '#432020', '#2e1414'], gr: ['#44383a', '#262022'], snow: 0, stars: 1, kind: 'city', neon: '#ff9a4d' },
+  { sky: ['#14142a', '#5a3a8a'], mt: ['#2a2a50', '#1e1e3c', '#14142a'], gr: ['#363648', '#1e1e28'], snow: 0, stars: 1, kind: 'city', neon: '#b46aff' },
+  { sky: ['#0a0a14', '#2a2a5a'], mt: ['#1d1d3a', '#14142a', '#0c0c1c'], gr: ['#2e2e3a', '#181820'], snow: 0, stars: 1, kind: 'city', neon: '#ff4d6a' },
+  { sky: ['#12020a', '#8a0f2a'], mt: ['#3a0f1a', '#2a0a12', '#1a060a'], gr: ['#3a2a30', '#201418'], snow: 0, stars: 1, kind: 'city', neon: '#ffd84a' },
+  { sky: ['#1b2350', '#c46a8a'], mt: ['#3a3f6a', '#2a2f55', '#1d2140'], gr: ['#3b3f4f', '#23262f'], snow: 0, stars: 1, kind: 'city', neon: '#ff7ad9' },
+  { sky: ['#101a40', '#3a5a9a'], mt: ['#2c3a6a', '#1f2a50', '#151d3a'], gr: ['#343a4a', '#1e222c'], snow: 0, stars: 1, kind: 'city', neon: '#6aa8ff' },
+  { sky: ['#2a1040', '#8a3a7a'], mt: ['#43285f', '#321d49', '#231435'], gr: ['#3a3446', '#221e2a'], snow: 0, stars: 1, kind: 'city', neon: '#ffd84a' },
+  { sky: ['#0a2a3a', '#2a8a9a'], mt: ['#1f4a5a', '#16384a', '#0e2736'], gr: ['#33424a', '#1c262c'], snow: 0, stars: 1, kind: 'city', neon: '#4dffd0' },
+  { sky: ['#12020a', '#8a0f2a'], mt: ['#3a0f1a', '#2a0a12', '#1a060a'], gr: ['#3a2a30', '#201418'], snow: 0, stars: 1, kind: 'city', neon: '#ffd84a' }
 ];
-const CAFES = [1, 2, 3, 4, 6, 8, 11, 14, 17, 20, 24, 28, 22, 24, 22, 20, 26, 24, 22, 20, 18, 24, 26, 28, 26, 30, 34];
+const CAFES = [1, 2, 3, 4, 6, 8, 11, 14, 17, 20, 24, 28, 22, 24, 22, 20, 26, 24, 22, 20, 18, 24, 26, 28, 26, 30, 30, 32, 32, 34, 34, 36, 38, 44];
 function cafe(g, x, y, sc, neon, tag) {
   g.save(); g.translate(x, y); g.scale(sc, sc);
   if (neon) { g.shadowColor = neon; g.shadowBlur = 9; }
@@ -238,7 +270,16 @@ function makeBG(level) {
   g.fillStyle = sky; g.fillRect(0, 0, WW, WH);
   if (T.stars) { g.fillStyle = 'rgba(255,255,255,.85)'; for (let i = 0; i < 100; i++) { g.beginPath(); g.arc(R() * WW, R() * 90, R() * 1.6 + .4, 0, 7); g.fill(); } }
   if (T.kind === 'neon') { g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.arc(WW - 140, 80, 22, 0, 7); g.fill(); g.fillStyle = T.sky[0]; g.beginPath(); g.arc(WW - 132, 74, 20, 0, 7); g.fill(); }
-  const layers = [{ y: 105, h: 80 }, { y: 125, h: 70 }, { y: 140, h: 55 }];
+  const layers = T.kind === 'city' ? [] : [{ y: 105, h: 80 }, { y: 125, h: 70 }, { y: 140, h: 55 }];
+  if (T.kind === 'city') {
+    [[.55, 70, 38, 90], [.8, 90, 46, 120], [1, 110, 60, 150]].forEach((ly, li) => {
+      g.fillStyle = T.mt[li]; let x = -10;
+      while (x < WW) { const bw = ly[2] + R() * ly[2] * .8, bh = ly[1] + R() * ly[3], by = FIELD_TOP + 8 - bh; g.fillRect(x, by, bw, bh + 12);
+        if (li === 2 && R() < .35) { g.fillStyle = T.neon; g.globalAlpha = .85; g.fillRect(x + 4, by + 6, bw - 8, 8); g.globalAlpha = 1; g.fillStyle = T.mt[li]; }
+        g.fillStyle = 'rgba(255,230,150,' + (.25 + li * .18) + ')'; for (let wy = by + 22; wy < FIELD_TOP; wy += 14) for (let wx = x + 6; wx < x + bw - 8; wx += 12) if (R() < .45) g.fillRect(wx, wy, 5, 7); g.fillStyle = T.mt[li]; x += bw + R() * 8; }
+    });
+    for (let i = 0; i < Math.min(CAFES[level], 18); i++) { const px = 40 + R() * (WW - 80); cafe(g, px, FIELD_TOP - 60 - R() * 40, 1, T.neon, i % 2 === 0); }
+  }
   const total = CAFES[level] * 2, share = [.25, .35, .4];
   layers.forEach((ly, li) => {
     g.fillStyle = T.mt[li]; g.beginPath(); g.moveTo(0, FIELD_TOP + 60);
@@ -254,7 +295,13 @@ function makeBG(level) {
   const gr = g.createLinearGradient(0, FIELD_TOP, 0, WH);
   gr.addColorStop(0, T.gr[0]); gr.addColorStop(1, T.gr[1]);
   g.fillStyle = gr; g.fillRect(0, FIELD_TOP - 6, WW, WH);
-  if (T.kind === 'gabar') {
+  if (T.kind === 'city') {
+    g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 3; g.setLineDash([26, 22]); for (let ly = FIELD_TOP + 140; ly < WH; ly += 210) { g.beginPath(); g.moveTo(0, ly); g.lineTo(WW, ly); g.stroke(); } g.setLineDash([]);
+    for (let i = 0; i < 60; i++) { const x = R() * WW, y = FIELD_TOP + 20 + R() * (WH - FIELD_TOP - 40); g.fillStyle = 'rgba(255,255,255,' + (.03 + R() * .05) + ')'; g.fillRect(x, y, 30 + R() * 60, 2); }
+    for (let i = 0; i < 14; i++) { const x = R() * WW, y = FIELD_TOP + 30 + R() * (WH - FIELD_TOP - 60); g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, 10, 0, 7); g.stroke(); }
+    for (let k = 0; k < 6; k++) { const cx = 120 + R() * (WW - 240), cy = FIELD_TOP + 100 + R() * (WH - FIELD_TOP - 200); g.fillStyle = 'rgba(255,255,255,.14)'; for (let z = 0; z < 6; z++) g.fillRect(cx + z * 14, cy, 8, 46); }
+    const hg2 = g.createLinearGradient(0, FIELD_TOP - 6, 0, FIELD_TOP + 50); hg2.addColorStop(0, T.neon + '55'); hg2.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = hg2; g.fillRect(0, FIELD_TOP - 6, WW, 56);
+  } else if (T.kind === 'gabar') {
     for (let i = 0; i < 1100; i++) { const x = R() * WW, y = FIELD_TOP + R() * (WH - FIELD_TOP); g.strokeStyle = 'rgba(20,60,25,' + (.15 + R() * .25) + ')'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(x, y); g.lineTo(x + R() * 4 - 2, y - 5 - R() * 5); g.stroke(); }
     for (let i = 0; i < 70; i++) { const x = R() * WW, y = FIELD_TOP + 10 + R() * (WH - FIELD_TOP - 20); g.fillStyle = ['#ffe36b', '#fff', '#ff9ec7'][i % 3]; g.beginPath(); g.arc(x, y, 2.2, 0, 7); g.fill(); }
     for (let i = 0; i < 24; i++) { const x = R() * WW, y = FIELD_TOP - 4 + R() * 12; g.fillStyle = '#1f4a2a'; g.beginPath(); g.moveTo(x, y - 34); g.lineTo(x - 13, y); g.lineTo(x + 13, y); g.fill(); g.beginPath(); g.moveTo(x, y - 48); g.lineTo(x - 10, y - 20); g.lineTo(x + 10, y - 20); g.fill(); g.fillStyle = '#4a2f1a'; g.fillRect(x - 2, y, 4, 8); }
@@ -276,19 +323,21 @@ function getBG(i) { let c = bgs.get(i); if (!c) { c = makeBG(i); bgs.set(i, c); 
 function startLevel(i) {
   L = i; const lv = LEVELS[i];
   const online = !!net.role, isG = net.role === 'guest';
-  players = [mkWolf(110, WH - 90, isG ? net.hostSkin : skinW, !isG), mkWolf(175, WH - 135, isG ? skinW : net.p2skin, isG)];
-  players[1].on = online; wolf = players[isG ? 1 : 0]; maxLives = online ? 4 : 3;
+  if (net.role === 'host') buildRoster();
+  const roster = online ? net.roster : [{ n: myNick, k: skinW }], meIdx = isG ? net.me : 0;
+  players = roster.map((r, k) => { const P = mkWolf(110 + k * 55, WH - 90 - k * 36, r.k, k === meIdx); P.nick = r.n; P.hp = 3; P.down = false; P.rv = 0; return P; });
+  wolf = players[meIdx] || players[0]; maxLives = 3;
   lives = maxLives; got = 0; inv = 0; shake = 0; dashCd = 0; matchas = []; rocks = []; rivals = []; hazards = []; parts = []; popups = []; princess = null; paused = false;
   if (i === 0 || !score) score = 0;
   bgCache = getBG(i); updateCam(true);
   const R = mulberry(500 + i * 31);
-  for (let k = 0; k < Math.round((4 + i) * 2.4); k++) {
+  for (let k = 0; k < Math.min(30, Math.round((4 + i) * 2.4)); k++) {
     for (let tries = 0; tries < 40; tries++) {
       const r = { x: 80 + R() * (WW - 160), y: FIELD_TOP + 40 + R() * (FIELD_BOT - FIELD_TOP - 80), r: 20 + R() * 16 };
       if (dist(r, wolf) > 130 && rocks.every(o => dist(o, r) > o.r + r.r + 50)) { rocks.push(r); break; }
     }
   }
-  const total = Math.round(lv.quota * 1.6) + 4;
+  const total = Math.round(Q() * 1.6) + 4;
   for (let k = 0; k < total; k++) spawnMatcha(k % 6 === 5);
   lv.rivals.forEach((t, idx) => {
     const e = { type: t, x: WW * rand(.5, .95), y: rand(FIELD_TOP + 60, WH - 120), t: rand(0, 2), st: 0, vx: 0, vy: 0, tx: 0, ty: 0, minions: 0, tele: null };
@@ -298,10 +347,11 @@ function startLevel(i) {
     if (t === 'fund' || t === 'kargo' || t === 'teyze') { e.tx = e.x; e.ty = e.y; }
     if (t === 'dolmus') { e.x = -400; e.y = -400; e.lane = null; e.vx = 0; e.vy = 0; }
     if (t === 'cat') { e.carry = false; e.flee = 0; e.stun = 0; }
+    if (t === 'drone' || t === 'crane' || t === 'robot' || t === 'ghost') { e.tx = e.x; e.ty = e.y; }
     rivals.push(e);
   });
   scene = 'play'; btns = [];
-  if (net.role === 'host') netSend({ t: 'start', L: i, hs: skinW });
+  if (net.role === 'host') for (const sid of okSlots()) hostSendTo(sid, { t: 'start', L: i, ps: net.roster, me: net.pmap[sid] });
 }
 function spawnMatcha(gold) {
   for (let tries = 0; tries < 60; tries++) {
@@ -313,11 +363,18 @@ function spawnMatcha(gold) {
 /* ---------- oynanış ---------- */
 function burst(x, y, col, n) { if (LITE) n = Math.ceil(n / 2); if (parts.length > 160) return; for (let i = 0; i < n; i++) { const a = Math.random() * 6.28, s = rand(40, 200); parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(.3, .8), max: .8, col, r: rand(2, 5) }); } }
 function popup(s, x, y, col) { popups.push({ s, x, y, life: 1, col: col || '#fff' }); }
+function allDown() { const on = players.filter(P => P.on); return on.length > 0 && on.every(P => P.down); }
+function checkAllDown() { if (scene === 'play' && net.role && allDown()) { overMsg = pick(MEME_OVER); scene = 'over'; sfx.lose(); setBtns(); } }
 function hurt(w) {
-  w = w || wolf; if (w.inv > 0 || scene !== 'play') return;
-  lives--; w.inv = 1.7; shake = .5;
+  w = w || wolf; if (w.inv > 0 || scene !== 'play' || w.down || !w.on) return;
+  w.inv = 1.7; shake = .5;
   if (w === wolf) punch = { t: 0 }; else if (net.role === 'host') net.evq.push(['pu', players.indexOf(w)]);
   sfx.hurt(); burst(w.x, w.y, '#c9ced6', 22); popup(pick(MEME_HURT), w.x, w.y - 30, '#e6e9ee');
+  if (net.role) {
+    w.hp--; if (w.hp <= 0) { w.down = true; w.rv = 0; w.energyT = 0; w.drinkT = 0; popup((w.nick || 'oyuncu') + ' yere düştü!', w.x, w.y - 56, '#ff9a9a'); checkAllDown(); }
+    return;
+  }
+  lives--;
   if (lives <= 0) { overMsg = pick(MEME_OVER); scene = 'over'; sfx.lose(); setBtns(); }
 }
 const MEME_PICK = ['+1', 'aura +100', 'W', 'sigma', 'ez', 'based', 'gg', 'mood', 'çok iyi'], MEME_GOLD = ['GIGACHAD +2', 'jackpot', 'bro cooked'],
@@ -326,13 +383,13 @@ const MEME_PICK = ['+1', 'aura +100', 'W', 'sigma', 'ez', 'based', 'gg', 'mood',
 const pick = a => a[Math.floor(Math.random() * a.length)];
 let overMsg = '', winMsg = '';
 function drink(w) {
-  if (scene !== 'play' || paused || w.drinkT > 0) return;
+  if (scene !== 'play' || paused || w.drinkT > 0 || w.down) return;
   if (w.energyT > .9) { if (w === wolf) popup('zaten enerjiksin!', w.x, w.y - 34, '#c6f08a'); return; }
   if (w.stock <= 0) { if (w === wolf) popup('matcha yok!', w.x, w.y - 34, '#ffb3b3'); return; }
   w.stock--; w.drinkT = .45; w.energyT = Math.min(1, Math.max(0, w.energyT) + .85); sfx.slurp(); burst(w.x, w.y - 10, '#9be36b', 20); popup(pick(MEME_DRINK), w.x, w.y - 40, '#c6f08a');
 }
 function doDash() {
-  if (net.role === 'guest') { if (scene === 'play' && wolf.stock > 0 && wolf.drinkT <= 0) netSend({ t: 'dr' }); return; }
+  if (net.role === 'guest') { if (scene === 'play' && !wolf.down && wolf.stock > 0 && wolf.drinkT <= 0) netSend({ t: 'dr' }); return; }
   drink(wolf);
 }
 function inputVec() {
@@ -344,7 +401,7 @@ function inputVec() {
   return [vx, vy];
 }
 function mkWolf(x, y, skin, local) { return { x, y, r: 17, dir: 1, energyT: 0, drinkT: 0, stock: 1, trail: [], face: 1, inv: 0, skin, on: true, local, in: { vx: 0, vy: 0 }, moving: false }; }
-function nearest(o) { let b = null, bd = 1e9; for (const P of players) if (P.on) { const d = dist(o, P); if (d < bd) { bd = d; b = P; } } return b || players[0]; }
+function nearest(o) { let b = null, bd = 1e9; for (const P of players) if (P.on && !P.down) { const d = dist(o, P); if (d < bd) { bd = d; b = P; } } if (b) return b; for (const P of players) if (P.on) return P; return players[0]; }
 function stepWolf(wolf, vx, vy, dt) {
   const slow = hazards.some(h => h.k === 'puddle' && dist(h, wolf) < h.r) ? .5 : 1;
   const sp = 235 * slow * (1 + .75 * Math.max(0, wolf.energyT)) * (wolf.drinkT > 0 ? .35 : 1);
@@ -361,17 +418,23 @@ function stepWolf(wolf, vx, vy, dt) {
 function update(dt) {
   time += dt; if (paused) return;
   const lv = LEVELS[L];
-  for (const P of players) { if (!P.on) continue; if (P.local) { const [vx, vy] = inputVec(); stepWolf(P, vx, vy, dt); } else stepWolf(P, P.in.vx, P.in.vy, dt); }
+  for (const P of players) { if (!P.on) continue; if (P.down) { P.moving = false; if (P.inv > 0) P.inv -= dt; continue; } if (P.local) { const [vx, vy] = inputVec(); stepWolf(P, vx, vy, dt); } else stepWolf(P, P.in.vx, P.in.vy, dt); }
+  if (net.role) for (const D of players) {
+    if (!D.on || !D.down) continue;
+    const near = players.some(P => P.on && !P.down && dist(P, D) < 66);
+    D.rv = near ? D.rv + dt : Math.max(0, D.rv - dt * 1.5);
+    if (D.rv >= 1) { D.down = false; D.hp = 1; D.rv = 0; D.energyT = 0; D.drinkT = 0; D.inv = 2.4; popup((D.nick || 'oyuncu') + ' ayağa kalktı!', D.x, D.y - 50, '#9be36b'); sfx.pick(); burst(D.x, D.y, '#9be36b', 24); }
+  }
   if (shake > 0) shake -= dt;
   for (const wolf of players) {
-    if (!wolf.on) continue;
+    if (!wolf.on || wolf.down) continue;
   for (let i = matchas.length - 1; i >= 0; i--) {
       const m = matchas[i]; if (dist(m, wolf) < m.r + wolf.r + 4 + 46 * Math.max(0, wolf.energyT)) {
         wolf.stock = Math.min(3, wolf.stock + 1);
         matchas.splice(i, 1); const add = m.gold ? 2 : 1; got += add; score += m.gold ? 300 : 100;
         burst(m.x, m.y, m.gold ? '#ffd84a' : '#9be36b', m.gold ? 26 : 14); popup(m.gold ? pick(MEME_GOLD) : pick(MEME_PICK), m.x, m.y - 20, m.gold ? '#ffd84a' : '#d8ffc0');
         m.gold ? sfx.gold() : sfx.pick();
-        if (got >= lv.quota && !princess) {
+        if (got >= Q() && !princess) {
           let px = wolf.x < WW / 2 ? WW - 100 : 100, py = wolf.y < WH / 2 ? WH - 80 : FIELD_TOP + 70;
           rocks = rocks.filter(r => dist(r, { x: px, y: py }) > (r.r || 24) + 70); princess = { x: px, y: py, t: 0 }; popup('Prenses göründü!', wolf.x, wolf.y - 70, '#ffe08a'); sfx.win(); burst(px, py, '#ffe08a', 40);
           matchas.length = 0; break;
@@ -379,11 +442,11 @@ function update(dt) {
       }
     }
   }
-  if (!princess && matchas.length < Math.max(4, lv.quota - got + 3)) spawnMatcha(Math.random() < .15);
-  if (princess) { princess.t += dt; if (players.some(P => P.on && dist(princess, P) < 40)) { score += lives * 200; winMsg = pick(MEME_WIN); scene = 'cleared'; sfx.win(); burst(princess.x, princess.y, '#ffd84a', 60); if (L + 1 > progress) { progress = Math.min(L + 1, LEVELS.length - 1); saveProg(); } setBtns(); } }
+  if (!princess && matchas.length < Math.max(4, Q() - got + 3)) spawnMatcha(Math.random() < .15);
+  if (princess) { princess.t += dt; if (players.some(P => P.on && !P.down && dist(princess, P) < 40)) { score += (net.role ? players.reduce((a, P) => a + (P.on ? Math.max(0, P.hp) : 0), 0) : lives) * 200; winMsg = pick(MEME_WIN); scene = 'cleared'; sfx.win(); burst(princess.x, princess.y, '#ffd84a', 60); if (L + 1 > progress) { progress = Math.min(L + 1, LEVELS.length - 1); saveProg(); } setBtns(); } }
 
   // rakipler
-  const lvf = 1 + Math.min(L, 11) * .06 + Math.max(0, L - 11) * .012;
+  const lvf = 1 + Math.min(L, 11) * .06 + Math.max(0, L - 11) * .012 + Math.max(0, L - 20) * .02;
   for (const e of rivals) {
     e.t += dt; const wolf = nearest(e);
     if (e.type === 'drummer') {
@@ -437,6 +500,25 @@ function update(dt) {
       const a = Math.atan2(e.ty - e.y, e.tx - e.x); e.x += Math.cos(a) * 55 * dt; e.y += Math.sin(a) * 55 * dt;
       if (e.t > 3.4 / lvf) { e.t = 0; hazards.push({ k: 'bag', sx: e.x, sy: e.y, x: e.x, y: e.y, tx: wolf.x, ty: wolf.y, t: 0, src: e }); sfx.warn(); }
       if (dist(e, wolf) < 34) hurt(wolf);
+    } else if (e.type === 'drone') {
+      if (e.st === 0) { const a = Math.atan2(wolf.y - e.y + rand(-60, 60) * 0, wolf.x - e.x); e.x += Math.cos(a) * 85 * lvf * dt; e.y += Math.sin(a) * 85 * lvf * dt; if (e.t > 2.5 / lvf) { e.st = 1; e.t = 0; const aa = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.vx = Math.cos(aa) * 700; e.vy = Math.sin(aa) * 700; sfx.warn(); } }
+      else if (e.st === 1) { if (e.t > .95 / Math.sqrt(lvf)) { e.st = 2; e.t = 0; sfx.dash(); } }
+      else if (e.st === 2) { e.x += e.vx * dt; e.y += e.vy * dt; for (const P of players) if (P.on && !P.down && dist(e, P) < 36) hurt(P); if (e.t > .5 || e.x < 20 || e.x > WW - 20 || e.y < FIELD_TOP - 40 || e.y > WH - 10) { e.x = clamp(e.x, 20, WW - 20); e.y = clamp(e.y, FIELD_TOP - 40, WH - 10); e.st = 3; e.t = 0; } }
+      else { if (e.t > .9) { e.st = 0; e.t = 0; } }
+      if (e.st !== 2 && dist(e, wolf) < 30) hurt(wolf);
+    } else if (e.type === 'crane') {
+      if (dist(e, { x: e.tx, y: e.ty }) < 12 || e.st === 0) { e.st = 1; e.tx = rand(80, WW - 80); e.ty = rand(FIELD_TOP + 30, FIELD_BOT - 40); }
+      { const a = Math.atan2(e.ty - e.y, e.tx - e.x); e.x += Math.cos(a) * 58 * dt; e.y += Math.sin(a) * 58 * dt; }
+      if (e.t > 3.8 / lvf) { e.t = 0; const a = Math.atan2(wolf.y - e.y, wolf.x - e.x); for (let k = 1; k <= 3; k++) hazards.push({ k: 'bomb', x: clamp(e.x + Math.cos(a) * 95 * k, 30, WW - 30), y: clamp(e.y + Math.sin(a) * 95 * k, FIELD_TOP, FIELD_BOT), t: -k * .22, fuse: 1.5, r: 58, pk: 2 }); sfx.warn(); }
+      if (dist(e, wolf) < 34) hurt(wolf);
+    } else if (e.type === 'robot') {
+      { const a = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.x += Math.cos(a) * 62 * lvf * dt; e.y += Math.sin(a) * 62 * lvf * dt; e.y = clamp(e.y, FIELD_TOP, FIELD_BOT); }
+      if (e.t > 3.3 / lvf) { e.t = 0; hazards.push({ k: 'ring', x: e.x, y: e.y, r: 10, max: 230, c: '#6ae0ff' }); sfx.warn(); }
+      if (dist(e, wolf) < 34) hurt(wolf);
+    } else if (e.type === 'ghost') {
+      if (e.st === 0) { const a = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.x += Math.cos(a) * 48 * dt; e.y += Math.sin(a) * 48 * dt; if (e.t > 4.2 / lvf) { e.st = 1; e.t = 0; sfx.warn(); } }
+      else { const a = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.x += Math.cos(a) * 128 * lvf * dt; e.y += Math.sin(a) * 128 * lvf * dt; if (e.t > 2.8) { e.st = 0; e.t = 0; } }
+      e.y = clamp(e.y, FIELD_TOP - 20, FIELD_BOT + 10); if (dist(e, wolf) < 32) hurt(wolf);
     } else if (e.type === 'zam' || e.type === 'baron') {
       e.x = clamp(wolf.x + Math.sin(time * .6) * 320, 60, WW - 60); e.y += (clamp(wolf.y - 260, 90, WH - 60) - e.y) * Math.min(1, dt * 2) + Math.sin(time * 1.3) * .25;
       if (e.t > (e.type === 'baron' ? 2.8 : 3.4) && e.minions < 6) { e.t = 0; e.minions++; hazards.push({ k: 'tag', x: e.x, y: e.y + 20, life: 13, own: e, v: 0 }); sfx.warn(); }
@@ -530,12 +612,19 @@ function wolfSprite(x, y, sc, face, sk, t, moving) {
 function drawWolf(wolf) {
   const sk = WOLF_SKINS[wolf.skin];
   wolf.trail.forEach(p => { ctx.globalAlpha = p.l / .3 * .4; ctx.fillStyle = '#9be36b'; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, 7); ctx.fill(); }); ctx.globalAlpha = 1;
+  if (wolf.down) {
+    shadow(wolf.x, wolf.y, 18); ctx.save(); ctx.translate(wolf.x, wolf.y + 6); ctx.rotate(1.45); ctx.globalAlpha = .55; wolfSprite(0, 0, 1, wolf.face, sk, time, false); ctx.restore(); ctx.globalAlpha = 1;
+    emoji('💀', wolf.x, wolf.y - 30 + Math.sin(time * 4) * 3, 26);
+    ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(wolf.x, wolf.y, 34, 0, 7); ctx.stroke();
+    if (wolf.rv > 0) { ctx.strokeStyle = '#9be36b'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(wolf.x, wolf.y, 34, -Math.PI / 2, -Math.PI / 2 + Math.min(1, wolf.rv) * 6.283); ctx.stroke(); }
+    txt((wolf.nick || '') + ' · yaklaş!', wolf.x, wolf.y - 52, 13, '#ffb3b3', 'center', '800', false); return;
+  }
   if (wolf.inv > 0 && Math.floor(time * 14) % 2 === 0) return;
   shadow(wolf.x, wolf.y, 18);
   if (wolf.energyT > 0) { ctx.globalAlpha = Math.min(1, .12 + .38 * wolf.energyT + .08 * Math.sin(time * 12)); const eg = ctx.createRadialGradient(wolf.x, wolf.y, 8, wolf.x, wolf.y, 42); eg.addColorStop(0, 'rgba(150,255,110,.9)'); eg.addColorStop(1, 'rgba(150,255,110,0)'); ctx.fillStyle = eg; ctx.beginPath(); ctx.arc(wolf.x, wolf.y, 42, 0, 7); ctx.fill(); ctx.globalAlpha = 1; }
   wolfSprite(wolf.x, wolf.y, 1, wolf.face, sk, time, wolf.moving);
   if (wolf.drinkT > 0) { const q = 1 - wolf.drinkT / .45; emoji('🍵', wolf.x + wolf.face * 16, wolf.y - 28 - Math.sin(q * 3.14) * 8, 26); }
-  if (net.role) txt(wolf === players[0] ? 'P1' : 'P2', wolf.x, wolf.y - 36, 13, wolf === players[0] ? '#7fc4ff' : '#ffb36b', 'center', '800', false);
+  if (net.role) { const pi = players.indexOf(wolf); txt(wolf.nick || ('P' + (pi + 1)), wolf.x, wolf.y - 38, 13, NICK_COL[pi % 4], 'center', '800', true); if (wolf === window.__me) { } }
 }
 function drawPrincess(p, skinIdx, sc, label) { princessSprite(p.x, p.y, p.t, PRINCESS_SKINS[skinIdx === undefined ? skinP : skinIdx], sc || 1, label !== false); }
 function princessSprite(px, py, t, sk, sc, label) {
@@ -592,25 +681,27 @@ function drawDolmus(e) {
 function drawRival(e) {
   if (e.type === 'queue') { drawQueue(e); return; }
   if (e.type === 'dolmus') { drawDolmus(e); return; }
-  const map = { drummer: ['🥁', 'Tak Tak Sahurcu'], fund: ['💸', 'Kraliçe Vurgun'], croc: ['🐊', 'Bombardıman'], ballerina: ['🩰', 'Kapuçino Balerin'], zam: ['🏷️', 'Zam Canavarı'], barista: ['☕', 'Stajyer Barista'], baron: ['🕴️', 'Franchise Baronu'], kargo: ['🚚', 'Kargo Kuryesi'], cat: ['🐈', 'Hırsız Kedi'], teyze: ['👵', 'Poşet Teyze'] };
+  const map = { drummer: ['🥁', 'Tak Tak Sahurcu'], fund: ['💸', 'Kraliçe Vurgun'], croc: ['🐊', 'Bombardıman'], ballerina: ['🩰', 'Kapuçino Balerin'], zam: ['🏷️', 'Zam Canavarı'], barista: ['☕', 'Stajyer Barista'], baron: ['🕴️', 'Franchise Baronu'], kargo: ['🚚', 'Kargo Kuryesi'], cat: ['🐈', 'Hırsız Kedi'], teyze: ['👵', 'Poşet Teyze'], drone: ['🚁', 'Dron Kurye'], crane: ['🏗️', 'Vinç Operatörü'], robot: ['🤖', 'Kasa Robotu'], ghost: ['👻', 'Fatura Hayaleti'] };
   const [ch, name] = map[e.type];
   if (e.type === 'ballerina' && e.tele) { const k = e.t / .9; ctx.strokeStyle = 'rgba(255,90,140,.9)'; ctx.lineWidth = 4; ctx.setLineDash([8, 6]); ctx.beginPath(); ctx.arc(e.tele.x, e.tele.y, 34 - k * 10, 0, 7); ctx.stroke(); ctx.setLineDash([]); emoji('⚠️', e.tele.x, e.tele.y, 22); }
+  if (e.type === 'drone' && e.st === 1) { const n = Math.hypot(e.vx, e.vy) || 1, fl = .35 + .4 * Math.abs(Math.sin(time * 16)); ctx.strokeStyle = 'rgba(255,60,60,' + fl + ')'; ctx.lineWidth = 34; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + e.vx / n * 520, e.y + e.vy / n * 520); ctx.stroke(); ctx.strokeStyle = 'rgba(255,200,200,.9)'; ctx.lineWidth = 3; ctx.setLineDash([12, 9]); ctx.stroke(); ctx.setLineDash([]); ctx.lineCap = 'butt'; }
+  if (e.type === 'ghost') ctx.globalAlpha = e.st === 1 ? .28 + .12 * Math.sin(time * 10) : 1;
   if (e.type !== 'croc' && e.type !== 'zam' && e.type !== 'baron') shadow(e.x, e.y, 22);
   ctx.save(); ctx.translate(e.x, e.y);
   if (e.type === 'ballerina' && e.st === 2) ctx.rotate(time * 18);
   if (e.type === 'drummer') ctx.rotate(Math.sin(time * 9) * .12);
   const big = (e.type === 'zam' || e.type === 'baron') ? 62 : e.type === 'croc' ? 54 : 44;
-  emoji(ch, 0, 0, big); ctx.restore();
+  emoji(ch, 0, 0, big); ctx.restore(); ctx.globalAlpha = 1;
   if (e.type === 'drummer' && e.t > 2.4) { ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(e.x, e.y, 28 + (e.t - 2.4) * 22, 0, 7); ctx.stroke(); }
   if (e.type === 'cat') { if (e.carry) emoji('🍵', e.x + 4, e.y - 28, 22); if (e.stun > 0) emoji('💫', e.x, e.y - 30, 24); }
   txt(name, e.x, e.y - 38, 13, '#ffd0d0');
 }
 function drawHazards() {
   for (const h of hazards) {
-    if (h.k === 'ring') { ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, 7); ctx.stroke(); ctx.strokeStyle = 'rgba(255,80,80,.8)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, 7); ctx.stroke(); }
+    if (h.k === 'ring') { ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, 7); ctx.stroke(); ctx.strokeStyle = h.c || 'rgba(255,80,80,.8)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, 7); ctx.stroke(); }
     else if (h.k === 'coin') { ctx.save(); ctx.translate(h.x, h.y); ctx.rotate(time * 10); ctx.fillStyle = '#ffd84a'; ctx.beginPath(); ctx.ellipse(0, 0, 10, Math.abs(Math.cos(time * 8)) * 10 + 2, 0, 0, 7); ctx.fill(); ctx.strokeStyle = '#a77b00'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore(); }
     else if (h.k === 'bomb') {
-      if (!h.boom) { const k = h.t / h.fuse; ctx.fillStyle = 'rgba(255,60,60,' + (.15 + .25 * Math.abs(Math.sin(time * 12))) + ')'; ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, 7); ctx.fill(); ctx.strokeStyle = 'rgba(255,80,80,.95)'; ctx.lineWidth = 3; ctx.setLineDash([10, 7]); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = 'rgba(255,120,60,.5)'; ctx.beginPath(); ctx.arc(h.x, h.y, h.r * k, 0, 7); ctx.fill(); emoji(h.pk ? '📦' : '💣', h.x, h.y - 6 + (1 - k) * -30, 26); }
+      if (!h.boom) { const k = Math.max(0, h.t / h.fuse); ctx.globalAlpha = h.t < 0 ? .35 : 1; ctx.fillStyle = 'rgba(255,60,60,' + (.15 + .25 * Math.abs(Math.sin(time * 12))) + ')'; ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, 7); ctx.fill(); ctx.strokeStyle = 'rgba(255,80,80,.95)'; ctx.lineWidth = 3; ctx.setLineDash([10, 7]); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = 'rgba(255,120,60,.5)'; ctx.beginPath(); ctx.arc(h.x, h.y, h.r * k, 0, 7); ctx.fill(); emoji(h.pk === 2 ? '🧱' : h.pk ? '📦' : '💣', h.x, h.y - 6 + (1 - k) * -30, 26); ctx.globalAlpha = 1; }
       else { const k = h.boom / .35; const g = ctx.createRadialGradient(h.x, h.y, 5, h.x, h.y, h.r); g.addColorStop(0, 'rgba(255,255,200,' + k + ')'); g.addColorStop(.5, 'rgba(255,140,40,' + k * .9 + ')'); g.addColorStop(1, 'rgba(200,40,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, 7); ctx.fill(); }
     }
     else if (h.k === 'bag') { ctx.save(); ctx.translate(h.x, h.y); ctx.rotate(time * 12); emoji('🛍️', 0, 0, 30); ctx.restore(); }
@@ -691,6 +782,7 @@ const WHO = {
   zam: { n: 'Zam Canavarı', c: '#ff6b6b', e: '🏷️' }, mafya: { n: 'Matcha Mafyası', c: '#b9bcc6', e: '🕶️' },
   dolmus: { n: 'Dolmuş Şoförü', c: '#ffcf6b', e: '🚐' }, kargo: { n: 'Kargo Kuryesi', c: '#c9a06a', e: '🚚' }, cat: { n: 'Hırsız Kedi', c: '#ffd9a0', e: '🐈' }, teyze: { n: 'Poşet Teyze', c: '#e6a0d0', e: '👵' },
   barista: { n: 'Stajyer Barista', c: '#d9a066', e: '☕' }, queue: { n: 'Kuyruktaki Adam', c: '#cfd6e2', e: '🧍' },
+  drone: { n: 'Dron Kurye', c: '#7fd6ff', e: '🚁' }, crane: { n: 'Vinç Operatörü', c: '#ffc34d', e: '🏗️' }, robot: { n: 'Kasa Robotu', c: '#9fb4c8', e: '🤖' }, ghost: { n: 'Fatura Hayaleti', c: '#d0c8ff', e: '👻' },
   baron: { n: 'Franchise Baronu', c: '#ff5d73', e: '🕴️' }, imp: { n: 'Nevada İmparatoru', c: '#ffd84a', e: '👑' }
 };
 const STORY = {
@@ -866,6 +958,8 @@ const STORY = {
       ['barista', 'Lattemizi poşetle servis ediyoruz.']
     ],
     21: [
+      ['narr', 'PERDE 3: NEVADA METROPOLÜ. Çöl bitti, asfalt başladı. Gökdelenler, trafik ışıkları ve her köşede bir şube.'],
+      ['prin', 'Kurt, burası artık çöl değil. Yeni karakterler, yeni hızlar, yeni sorunlar. Dikkatli ol.'],
       ['fund', 'Yeni fonumuz: Kurt Matcha Fonu. Getirisi garantili: matcha yok, ama getiri var.'],
       ['cat', 'Miyav. (Tercüme: Fona ortak oldum.)'],
       ['dolmus', 'Reklam arası. Herkes ineceğiz.'],
@@ -896,6 +990,57 @@ const STORY = {
       ['baron', 'Her ikisi de ücretli.']
     ],
     26: [
+      ['narr', 'Metropolün üstünde bir vızıltı. Gökyüzü dronlarla doldu.'],
+      ['drone', 'Paketiniz yolda. Kırmızı çizgiyi görürseniz lütfen çizginin üstünde durmayın.'],
+      ['wolf', 'Çizgi mi? Hangi çizgi?'],
+      ['drone', 'Bu çizgi. Şu an. Bir saniye sonra buradayım.'],
+      ['prin', 'Çizgiyi görür görmez yana kaç kurt!']
+    ],
+    27: [
+      ['narr', 'Yeni bir inşaat alanı. Bir vinç matcha kasesinin üstüne tuğla bırakıyor.'],
+      ['crane', 'Üç tuğla birden. İş güvenliği tabelasını da düşürdüm, o da hasarlı.'],
+      ['wolf', 'Tuğlalar sıra sıra geliyor.'],
+      ['crane', 'Evet, çünkü hat üzerinden bırakıyorum. Profesyonel iş.'],
+      ['prin', 'Sıranın ucuna değil, yanına kaç!']
+    ],
+    28: [
+      ['narr', 'Marketin kasaları kendi kendine çalışmaya başladı. Kasa robotları, "fiş ister misiniz?" diye soruyor.'],
+      ['robot', 'Fiş ister misiniz? Hayır mı? Önemli değil, halka dalgası yolluyorum.'],
+      ['wolf', 'Bu bir kasa değil, bir cihaz.'],
+      ['robot', 'Kasa-Cihaz 3000. Yenilenmiş sürüm. Sadece 1 yıl garantili.'],
+      ['prin', 'Dalgaların arasından zıpla ve devam et!']
+    ],
+    29: [
+      ['narr', 'Gece olunca metropolün faturaları hayalet oldu. Kimse bu faturaları ödemedi, ama hepsi sana geliyor.'],
+      ['ghost', 'Ben Fatura Hayaleti. Seni her ay görmeye geliyorum.'],
+      ['wolf', 'Ben abone olmadım.'],
+      ['ghost', 'Aboneliğin otomatik yenilendi.'],
+      ['prin', 'Soluklaşınca daha hızlı oluyor kurt, mesafeni koru!']
+    ],
+    30: [
+      ['narr', 'Gece vardiyası. Metropolde herkes çalışıyor, hiç kimse uyumuyor ve hiç kimse maaş almıyor.'],
+      ['robot', 'Vardiya değişimi: Ben, hayalet, dron ve vinç.'],
+      ['ghost', 'Ben fatura keseceğim.'],
+      ['drone', 'Ben çizgi çekeceğim.'],
+      ['crane', 'Ben tuğla bırakacağım.'],
+      ['prin', 'Hepsi bir arada. Ama senin matchan var. Matcha iç ve hızlan!']
+    ],
+    31: [
+      ['narr', 'Metropolün trafiği iki katmanlı: yerde dolmuşlar, havada dronlar. Arada kalan kurt.'],
+      ['dolmus', 'Yer var abi! Üst katta da var!'],
+      ['drone', 'Hava yolu hattı da bende.'],
+      ['wolf', 'Hepsi bana doğru geliyor.'],
+      ['prin', 'Hem yerdeki şeritlere hem havadaki çizgilere dikkat!']
+    ],
+    32: [
+      ['narr', 'Yönetim kurulunun toplantı odasına girdik. Masada baron, robot, hayalet, vinç operatörü, dron kurye ve fon yöneticisi oturuyor.'],
+      ['baron', 'Toplantıyı açıyorum. Gündem: matcha toplayan kurt.'],
+      ['fund', 'Oylamaya sunuyorum: kurdu önleyelim.'],
+      ['robot', 'Oylama sonucu: oybirliği.'],
+      ['wolf', 'Ben de oy kullanabilir miyim?'],
+      ['baron', 'Hayır. Ama toplantı bitmeden kaçabilirsin.']
+    ],
+    33: [
       ['narr', 'Tahtın önünde bütün karakterler toplandı. Hepsi aynı anda konuşuyor, kimse dinlemiyor. Hikâyenin gerçek finali bu.'],
       ['imp', 'Ben Nevada İmparatoruyum. Her şubenin tepesi, her kuyruğun sonu, her fincanın dibi bendedir.'],
       ['wolf', 'Ben sadece matcha topladım.'],
@@ -963,7 +1108,7 @@ function drawCut() {
 
 /* ---------- çevrimiçi co-op (PeerJS, oda kodu) ---------- */
 const CODE_CH = 'ABCDEFGHJKMNPRSTUVYZ23456789';
-const net = { lastRx: 0, ping: 0, role: null, peer: null, conn: null, code: '', status: '', joined: false, evq: [], acc: 0, startL: 0, hostSkin: 0, p2skin: 0 };
+const net = { lastRx: 0, ping: 0, role: null, peer: null, conn: null, code: '', status: '', joined: false, evq: [], acc: 0, startL: 0, slots: [null, null, null, null], me: 0, slot: 0, roster: null, pmap: {}, lb: [], ready: false, started: false, mqs: [], mqConns: {}, via: '', mqConn: null };
 let joinCode = '';
 const _popup = popup, _burst = burst, _sfx = Object.assign({}, sfx);
 popup = function (s2, x, y, c) { _popup(s2, x, y, c); if (net.role === 'host') net.evq.push(['p', s2, x, y, c]); };
@@ -1003,14 +1148,34 @@ class MQ {
   close() { this.dead = true; clearInterval(this.ka); try { this.ws && this.ws.close(); } catch (e) { } }
 }
 function mqAll(cb) { const list = []; MQ_BROKERS().forEach(u => { const m = new MQ(u); m.connect(ok => { if (ok) { list.push(m); cb(m); } }); }); return list; }
-function mkMqConn(mq, sendTopic, wrapG) {
+function mkMqConn(mq, sendTopic, wrapG, noClose) {
   const c = { open: true, mq, _h: {}, on(e, f) { this._h[e] = f; }, send(o) { mq.pub(sendTopic, wrapG ? { g: wrapG, d: o } : o); }, close() { try { mq.close(); } catch (e) { } } };
-  mq.onclose = () => { c.open = false; if (c._h.close) c._h.close(); };
+  if (!noClose) mq.onclose = () => { c.open = false; if (c._h.close) c._h.close(); };
   return c;
 }
 function mqCloseAll(except) { (net.mqs || []).forEach(m => { if (m !== except) m.close(); }); net.mqs = except ? [except] : []; }
+const MAXP = 4, NICK_COL = ['#7fc4ff', '#ffb36b', '#9be36b', '#ff8ac6'];
+function cleanNick(s) { return String(s || '').replace(/[^A-Za-z0-9ÇĞİÖŞÜçğıöşü ]/g, '').trim().toUpperCase().slice(0, 10); }
+let nickFresh = false;
+let myNick = 'KURT' + (10 + Math.floor(Math.random() * 90));
+try { const sv = cleanNick(localStorage.getItem('matchaNick')); if (sv) myNick = sv; } catch (e) { }
+function saveNick() { try { localStorage.setItem('matchaNick', myNick); } catch (e) { } }
 function netSend(o) { try { if (net.conn && net.conn.open) net.conn.send(o); } catch (e) { } }
-function peerOpts() { return window.PEER_CFG || { config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:global.stun.twilio.com:3478' }, { urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turn:openrelay.metered.ca:443?transport=tcp'], username: 'openrelayproject', credential: 'openrelayproject' }] } }; }
+function hostSendTo(i, o) { const s = net.slots[i]; try { if (s && s.conn && s.conn.open) s.conn.send(o); } catch (e) { } }
+function slotIds() { const a = []; for (let i = 1; i < MAXP; i++) if (net.slots[i]) a.push(i); return a; }
+function okSlots() { return slotIds().filter(i => net.slots[i].ok); }
+function hostBroadcast(o) {
+  const used = new Set();
+  for (const i of slotIds()) { const s = net.slots[i]; if (!s.ok || !s.conn.open) continue; if (s.conn.mq) { if (!used.has(s.conn.mq)) { used.add(s.conn.mq); s.conn.mq.pub(s.conn.bTopic, o); } } else { try { s.conn.send(o); } catch (e) { } } }
+}
+function iceServers(cb) {
+  const base = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:global.stun.twilio.com:3478' }, { urls: 'stun:stun.cloudflare.com:3478' }];
+  const cfg = window.TURN_CFG; if (!cfg) return cb(base.concat([{ urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turn:openrelay.metered.ca:443?transport=tcp'], username: 'openrelayproject', credential: 'openrelayproject' }]));
+  if (cfg.urls) return cb(base.concat([{ urls: cfg.urls, username: cfg.username, credential: cfg.credential }]));
+  if (cfg.metered) { let done = false; const fin = a => { if (done) return; done = true; cb(base.concat(a || [])); }; setTimeout(() => fin(null), 3500); try { fetch('https://' + cfg.metered.app + '.metered.live/api/v1/turn/credentials?apiKey=' + encodeURIComponent(cfg.metered.key)).then(r => r.json()).then(a => fin(Array.isArray(a) ? a : null)).catch(() => fin(null)); } catch (e) { fin(null); } return; }
+  cb(base);
+}
+function peerOpts(cb) { if (window.PEER_CFG) return cb(window.PEER_CFG); iceServers(ice => cb({ config: { iceServers: ice } })); }
 function ensurePeerLib(cb) {
   if (typeof Peer !== 'undefined') return cb(true);
   const sc = document.createElement('script'); sc.src = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
@@ -1024,64 +1189,107 @@ function errMsg(err) {
   return 'Bağlantı hatası' + (t ? ' (' + t + ')' : '') + '.';
 }
 function netReset(msg) {
-  try { net.conn && net.conn.close(); } catch (e) { } try { net.peer && net.peer.destroy(); } catch (e) { } mqCloseAll(); clearTimeout(net.jt1); clearTimeout(net.jt2); net.gid = null; net.via = '';
-  net.role = null; net.peer = null; net.conn = null; net.joined = false; net.code = ''; net.status = msg || ''; net.evq = []; net.mqs = []; net.p2skin = 0; net.hostSkin = 0;
-  if (players[1]) players[1].on = false; if (players[0]) wolf = players[0];
+  try { net.conn && net.conn.close(); } catch (e) { } try { for (const i of slotIds()) net.slots[i].conn.close(); } catch (e) { }
+  try { net.peer && net.peer.destroy(); } catch (e) { } mqCloseAll(); clearTimeout(net.jt1); clearTimeout(net.jt2);
+  net.gid = null; net.via = ''; net.role = null; net.peer = null; net.conn = null; net.joined = false; net.code = ''; net.status = msg || ''; net.evq = []; net.mqs = []; net.mqConns = {};
+  net.slots = [null, null, null, null]; net.roster = null; net.me = 0; net.started = false; net.ready = false; net.lb = []; net.mqConn = null;
+  if (players.length) { players = [players[Math.min(net.me, players.length - 1)] || players[0]]; players[0].on = true; players[0].local = true; wolf = players[0]; }
 }
-function leaveNet() { netReset(''); scene = 'menu'; setBtns(); }
-function netLost() {
+function leaveNet() { try { if (net.role === 'guest') netSend({ t: 'bye' }); } catch (e) { } netReset(''); scene = 'menu'; setBtns(); }
+function netLost(msg) {
   if (!net.role) return;
-  const was = scene; netReset('Bağlantı koptu.');
+  const was = scene; netReset(msg || 'Bağlantı koptu.');
   if (['play', 'cleared', 'over', 'final', 'lobbyG', 'host'].includes(was)) { scene = 'netlost'; setBtns(); } else if (was === 'join') { setBtns(); }
 }
 function newCode() { let c = ''; for (let i = 0; i < 4; i++) c += CODE_CH[Math.floor(Math.random() * CODE_CH.length)]; return c; }
-function setupConn(conn, isHost) {
-  const onOpen = () => {
-    if (net.conn && net.conn !== conn) { try { conn.close(); } catch (e) { } return; }
-    net.conn = conn; net.via = conn.mq ? 'relay' : 'rtc'; net.joined = true; net.lastRx = performance.now(); net.ping = 0;
-    if (isHost) { net.status = 'Oyuncu 2 bağlandı!'; net.startL = clamp(progress, 0, LEVELS.length - 1); }
-    else { net.role = 'guest'; scene = 'lobbyG'; net.status = 'Bağlandı! Host oyunu başlatacak...'; netSend({ t: 'hi', skin: skinW }); }
-    setBtns();
-  };
-  conn.on('open', onOpen);
-  conn.on('data', onNetData);
-  conn.on('close', () => { if (net.conn === conn) netLost(); });
-  conn.on('error', () => { if (net.conn === conn) netLost(); });
-  if (conn.open) onOpen();
+
+/* ---- host: gelen oyuncular ---- */
+function lobbyData() {
+  const ps = [{ n: myNick, k: skinW, r: 1, s: 0, v: 'h' }];
+  for (const i of okSlots()) { const s = net.slots[i]; ps.push({ n: s.nick, k: s.skin, r: s.ready ? 1 : 0, s: i, v: s.conn.mq ? 'r' : 'd' }); }
+  return { t: 'lb', ps, l: net.startL };
 }
-function hostStatus() { if (net.joined || net.role !== 'host') return; net.status = (net.peerOk || net.mqs.length) ? 'Oda hazır. Arkadaşını bekliyor...' : (net.hostFail ? 'Eşleştirme sunucularına ulaşılamadı. Ağ engelliyor olabilir.' : 'Oda kuruluyor...'); }
+function lobbyBroadcast() { hostBroadcast(lobbyData()); }
+function dropSlot(i, s) {
+  if (net.slots[i] !== s) return;
+  net.slots[i] = null; try { if (!s.conn.mq) s.conn.close(); } catch (e) { }
+  if (s.conn.gid && net.mqConns) delete net.mqConns[s.conn.gid];
+  net.joined = slotIds().length > 0; if (!net.joined) hostStatus();
+  if (net.started && net.pmap) { const P = players[net.pmap[i]]; if (P) { P.on = false; P.down = false; popup((P.nick || 'oyuncu') + ' ayrıldı', P.x, P.y - 40, '#ffb3b3'); } if (scene === 'play') checkAllDown(); }
+  else lobbyBroadcast();
+}
+function hostAccept(conn) {
+  const deny = why => { try { conn.send({ t: 'full', why }); } catch (e) { } setTimeout(() => { try { conn.close(); } catch (e) { } }, 400); };
+  if (net.started) return deny('started');
+  let i = -1; for (let k = 1; k < MAXP; k++) if (!net.slots[k]) { i = k; break; }
+  if (i < 0) return deny('full');
+  const s = { conn, nick: 'OYUNCU', skin: 0, ready: false, ok: false, lastRx: performance.now() };
+  net.slots[i] = s; net.joined = true; net.status = '';
+  conn.on('data', d => hostRx(i, s, d)); conn.on('close', () => dropSlot(i, s)); conn.on('error', () => dropSlot(i, s));
+}
+function hostRx(i, s, d) {
+  if (!d || net.slots[i] !== s) return; s.lastRx = performance.now();
+  if (d.t === 'hi') { s.nick = cleanNick(d.nick) || 'OYUNCU'; s.skin = clamp(d.skin | 0, 0, WOLF_SKINS.length - 1); s.ok = true; hostSendTo(i, { t: 'you', slot: i }); lobbyBroadcast(); }
+  else if (d.t === 'rd') { s.ready = !!d.v; lobbyBroadcast(); }
+  else if (d.t === 'bye') { dropSlot(i, s); }
+  else if (net.started && net.pmap && players[net.pmap[i]]) {
+    const P = players[net.pmap[i]];
+    if (d.t === 'in') { P.in.vx = clamp(+d.vx || 0, -1, 1); P.in.vy = clamp(+d.vy || 0, -1, 1); }
+    else if (d.t === 'dr') drink(P);
+  }
+}
+function kickSlot(i) { const s = net.slots[i]; if (!s) return; hostSendTo(i, { t: 'kick' }); setTimeout(() => dropSlot(i, s), 200); }
+function allReady() { const ids = okSlots(); return ids.length > 0 && ids.every(i => net.slots[i].ready) && slotIds().every(i => net.slots[i].ok); }
+function hostStart() { if (net.role !== 'host' || net.started || !allReady()) return; startLevel(net.startL); }
+function buildRoster() {
+  const roster = [{ n: myNick, k: skinW }]; net.pmap = {};
+  for (const i of okSlots()) { net.pmap[i] = roster.length; roster.push({ n: net.slots[i].nick, k: net.slots[i].skin }); }
+  net.roster = roster; net.started = true; return roster;
+}
+function hostStatus() { if (net.role !== 'host') return; if (net.joined) { net.status = ''; return; } net.status = (net.peerOk || net.mqs.length) ? 'Oda hazır. Arkadaşlarını bekliyor...' : (net.hostFail ? 'Eşleştirme sunucularına ulaşılamadı. Ağ engelliyor olabilir.' : 'Oda kuruluyor...'); }
+const mqTopic = (code, k) => 'matchaavi/v1/' + code + '/' + k;
 function hostRoom(tries) {
   net.status = 'Oda kuruluyor...';
   ensurePeerLib(ok => {
-    const code = newCode(); net.code = code; net.role = 'host'; net.joined = false; net.peerOk = false; net.hostFail = false; net.mqs = [];
-    if (ok) {
-      const peer = new Peer('matchaavi-' + code, Object.assign({}, peerOpts(), { debug: 0 })); net.peer = peer;
-      peer.on('open', () => { net.peerOk = true; hostStatus(); });
-      peer.on('error', err => { if (err.type === 'unavailable-id' && tries < 6) { try { peer.destroy(); } catch (e) { } mqCloseAll(); hostRoom(tries + 1); } else { net.peerOk = false; if (!net.mqs.length) net.status = errMsg(err); } });
-      peer.on('connection', conn => { if (net.conn) { try { conn.close(); } catch (e) { } return; } setupConn(conn, true); });
-    }
-    // yedek hat: kodu MQTT üzerinden de dinle
-    let acc = false; let tried = 0; const nB = MQ_BROKERS().length;
-    const lst = mqAll(m => {
-      net.mqs.push(m); hostStatus();
-      m.sub('matchaavi/v1/' + code + '/h', msg => {
-        if (!msg) return;
-        if (msg.t === 'join' && msg.g && !net.conn && !acc) {
-          acc = true; net.gid = msg.g; m.pub('matchaavi/v1/' + code + '/g/' + msg.g, { t: 'ack' });
-          mqCloseAll(m); const c = mkMqConn(m, 'matchaavi/v1/' + code + '/g/' + msg.g, null); net.mqConn = c; setupConn(c, true);
-        } else if (msg.g && msg.g === net.gid && net.mqConn && net.mqConn._h.data) net.mqConn._h.data(msg.d);
-        else if (msg.t === 'join' && msg.g === net.gid) m.pub('matchaavi/v1/' + code + '/g/' + msg.g, { t: 'ack' });
+    peerOpts(opts => {
+      const code = newCode(); net.code = code; net.role = 'host'; net.joined = false; net.peerOk = false; net.hostFail = false; net.mqs = []; net.mqConns = {}; net.slots = [null, null, null, null]; net.started = false; net.me = 0;
+      if (ok) {
+        const peer = new Peer('matchaavi-' + code, Object.assign({}, opts, { debug: 0 })); net.peer = peer;
+        peer.on('open', () => { net.peerOk = true; hostStatus(); });
+        peer.on('error', err => { if (err.type === 'unavailable-id' && tries < 6) { try { peer.destroy(); } catch (e) { } mqCloseAll(); hostRoom(tries + 1); } else { net.peerOk = false; if (!net.mqs.length) net.status = errMsg(err); } });
+        peer.on('connection', conn => { const go = () => hostAccept(conn); if (conn.open) go(); else conn.on('open', go); });
+      }
+      const hT = mqTopic(code, 'h'), bT = mqTopic(code, 'b');
+      mqAll(m => {
+        net.mqs.push(m); hostStatus();
+        m.onclose = () => { for (const i of slotIds()) { const s = net.slots[i]; if (s.conn.mq === m) dropSlot(i, s); } };
+        m.sub(hT, msg => {
+          if (!msg) return;
+          if (msg.t === 'join' && msg.g) {
+            const gid = msg.g, gT = mqTopic(code, 'g/' + gid); let c = net.mqConns[gid];
+            if (c) { if (c.mq === m) m.pub(gT, { t: 'ack' }); return; }
+            if (net.started || slotIds().length >= MAXP - 1) { m.pub(gT, { t: 'full' }); return; }
+            m.pub(gT, { t: 'ack' });
+            c = mkMqConn(m, gT, null, true); c.bTopic = bT; c.gid = gid; net.mqConns[gid] = c; hostAccept(c);
+          } else if (msg.g && net.mqConns[msg.g] && net.mqConns[msg.g].mq === m && net.mqConns[msg.g]._h.data) net.mqConns[msg.g]._h.data(msg.d);
+        });
       });
+      setTimeout(() => { if (net.role === 'host' && !net.peerOk && !net.mqs.length && !net.joined) { net.hostFail = true; hostStatus(); } }, 7000);
     });
-    setTimeout(() => { if (net.role === 'host' && !net.peerOk && !net.mqs.length && !net.joined) { net.hostFail = true; hostStatus(); } }, 7000);
-    if (!ok && false) hostStatus();
   });
 }
 function tryJoin() { if (joinCode.length === 4) joinRoom(joinCode); else net.status = '4 haneli kodu gir.'; }
+
+/* ---- misafir ---- */
+function guestOpen(conn) {
+  net.conn = conn; net.role = 'guest'; net.joined = true; net.lastRx = performance.now(); net.via = conn.mq ? 'relay' : 'rtc'; net.ready = false; net.lb = [];
+  conn.on('data', onNetData); conn.on('close', () => { if (net.conn === conn) netLost(); }); conn.on('error', () => { if (net.conn === conn) netLost(); });
+  scene = 'lobbyG'; net.status = ''; netSend({ t: 'hi', nick: myNick, skin: skinW }); setBtns();
+}
 function joinRoom(code) {
   net.status = 'Bağlanılıyor...'; net.mqs = [];
   clearTimeout(net.jt1); clearTimeout(net.jt2);
-  let chosen = false, peerFail = false;
+  let chosen = false;
   const gid = Math.random().toString(36).slice(2, 10);
   const stop = () => { clearTimeout(net.jt1); clearTimeout(net.jt2); };
   const fail = m => { if (chosen) return; chosen = true; stop(); net.status = m; try { net.peer && net.peer.destroy(); } catch (e) { } net.peer = null; mqCloseAll(); net.role = null; };
@@ -1090,46 +1298,49 @@ function joinRoom(code) {
     if (mqStarted || chosen) return; mqStarted = true; net.status = 'Yedek hat deneniyor...';
     mqAll(m => {
       net.mqs.push(m); let tries = 0, got = false;
-      const ping = () => { if (chosen || got || tries++ > 9) return; m.pub('matchaavi/v1/' + code + '/h', { t: 'join', g: gid }); setTimeout(ping, 900); };
-      m.sub('matchaavi/v1/' + code + '/g/' + gid, msg => {
+      const hT = mqTopic(code, 'h');
+      const ping = () => { if (chosen || got || tries++ > 9) return; m.pub(hT, { t: 'join', g: gid }); setTimeout(ping, 900); };
+      const h = msg => {
         if (!msg) return;
-        if (msg.t === 'ack' && !chosen && !got) {
-          got = true; chosen = true; stop(); try { net.peer && net.peer.destroy(); } catch (e) { } net.peer = null; mqCloseAll(m);
-          net.gid = gid; const c = mkMqConn(m, 'matchaavi/v1/' + code + '/h', gid); net.mqConn = c; setupConn(c, false);
-        } else if (net.mqConn && net.mqConn.mq === m && net.mqConn._h.data) net.mqConn._h.data(msg);
-      }, ping);
+        if (msg.t === 'ack' && !chosen && !got) { got = true; chosen = true; stop(); try { net.peer && net.peer.destroy(); } catch (e) { } net.peer = null; mqCloseAll(m); net.gid = gid; const c = mkMqConn(m, hT, gid); net.mqConn = c; guestOpen(c); }
+        else if (msg.t === 'full' && !chosen) fail(msg.why === 'started' ? 'Oyun çoktan başlamış.' : 'Oda dolu (4 kişi).');
+        else if (net.mqConn && net.mqConn.mq === m && net.mqConn._h.data) net.mqConn._h.data(msg);
+      };
+      m.sub(mqTopic(code, 'b'), h);
+      m.sub(mqTopic(code, 'g/' + gid), h, ping);
     });
   };
   ensurePeerLib(ok => {
     if (chosen) return;
-    net.jt1 = setTimeout(startMq, ok ? 3200 : 0);
-    net.jt2 = setTimeout(() => fail('Bağlanılamadı. Kod yanlış, oda kapalı ya da ağ engelliyor olabilir.'), 16000);
+    net.status = 'Direkt hat deneniyor...'; net.jt1 = setTimeout(startMq, ok ? 8000 : 0);
+    net.jt2 = setTimeout(() => fail('Bağlanılamadı. Kod yanlış, oda kapalı ya da ağ engelliyor olabilir.'), 22000);
     if (!ok) { startMq(); return; }
-    const peer = new Peer(undefined, Object.assign({}, peerOpts(), { debug: 0 })); net.peer = peer; net.role = null;
-    peer.on('error', err => { if (err && err.type === 'peer-unavailable') { startMq(); } else { peerFail = true; startMq(); } });
-    peer.on('open', () => {
-      const conn = peer.connect('matchaavi-' + code, { reliable: true, serialization: 'json' });
-      conn.on('open', () => { if (chosen && net.conn !== conn) { try { conn.close(); } catch (e) { } return; } chosen = true; stop(); mqCloseAll(); });
-      setupConn(conn, false);
+    peerOpts(opts => {
+      if (chosen) return;
+      const peer = new Peer(undefined, Object.assign({}, opts, { debug: 0 })); net.peer = peer; net.role = null;
+      peer.on('error', err => { startMq(); });
+      peer.on('open', () => {
+        const conn = peer.connect('matchaavi-' + code, { reliable: true, serialization: 'json' });
+        conn.on('open', () => { if (chosen) { try { conn.close(); } catch (e) { } return; } chosen = true; stop(); mqCloseAll(); guestOpen(conn); });
+      });
     });
   });
 }
 function onNetData(d) {
   if (!d) return; net.lastRx = performance.now();
   if (d.t === 'pg') return;
-  if (net.role === 'host') {
-    if (d.t === 'hi') net.p2skin = clamp(d.skin | 0, 0, WOLF_SKINS.length - 1);
-    else if (d.t === 'in') { players[1].in.vx = clamp(+d.vx || 0, -1, 1); players[1].in.vy = clamp(+d.vy || 0, -1, 1); }
-    else if (d.t === 'dr') drink(players[1]);
-  } else if (net.role === 'guest') {
-    if (d.t === 'start') { net.hostSkin = d.hs | 0; startLevel(d.L); }
-    else if (d.t === 'st') applySnap(d);
-  }
+  if (net.role !== 'guest') return;
+  if (d.t === 'lb') { net.lb = d.ps; net.startL = d.l; }
+  else if (d.t === 'you') net.slot = d.slot;
+  else if (d.t === 'kick') netLost('Host seni odadan attı.');
+  else if (d.t === 'full') netLost(d.why === 'started' ? 'Oyun çoktan başlamış.' : 'Oda dolu (4 kişi).');
+  else if (d.t === 'start') { net.roster = d.ps; net.me = d.me; startLevel(d.L); }
+  else if (d.t === 'st') applySnap(d);
 }
 function buildSnap() {
   const q = {
     t: 'st', sc: scene, L, lv: lives, g: got, s: score, om: overMsg, wm: winMsg,
-    w: players.map(P => ({ x: +P.x.toFixed(1), y: +P.y.toFixed(1), f: P.face, e: +P.energyT.toFixed(2), dr: +P.drinkT.toFixed(2), st: P.stock, iv: +P.inv.toFixed(2), k: P.skin, o: P.on ? 1 : 0 })),
+    w: players.map(P => ({ x: +P.x.toFixed(1), y: +P.y.toFixed(1), f: P.face, e: +P.energyT.toFixed(2), dr: +P.drinkT.toFixed(2), st: P.stock, iv: +P.inv.toFixed(2), k: P.skin, o: P.on ? 1 : 0, h: P.hp, d: P.down ? 1 : 0, rv: +(P.rv || 0).toFixed(2) })),
     m: matchas.map(m => [Math.round(m.x), Math.round(m.y), m.gold ? 1 : 0, +m.ph.toFixed(1)]),
     r: rivals.map(e => { const o = { x: +e.x.toFixed(1), y: +e.y.toFixed(1), t: +e.t.toFixed(2), st: e.st, tele: e.tele || null, ln: e.lane || null, vx: Math.round(e.vx || 0), vy: Math.round(e.vy || 0), cr: e.carry ? 1 : 0, sn: +(e.stun || 0).toFixed(2) }; if (e.type === 'queue') o.sg = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => { const p = e.hist[Math.max(0, e.hist.length - 1 - k * 22)]; return [Math.round(p.x), Math.round(p.y)]; }); return o; }),
     h: hazards.map(h => { const o = Object.assign({}, h); delete o.own; delete o.src; return o; }),
@@ -1148,7 +1359,7 @@ function applySnap(d) {
   if (d.sc === 'cleared' || d.sc === 'over' || d.sc === 'final') { if (scene !== d.sc) { scene = d.sc; setBtns(); } }
   L = d.L; lives = d.lv; got = d.g; score = d.s; overMsg = d.om; winMsg = d.wm;
   d.w.forEach((q, i) => {
-    const P = players[i]; if (!P) return; P.on = !!q.o; P.skin = q.k; P.stock = q.st; P.energyT = q.e; P.drinkT = q.dr; P.inv = q.iv;
+    const P = players[i]; if (!P) return; P.on = !!q.o; P.skin = q.k; P.stock = q.st; P.energyT = q.e; P.drinkT = q.dr; P.inv = q.iv; P.hp = q.h; P.down = !!q.d; P.rv = q.rv || 0;
     if (P === wolf) { const ex = q.x - P.x, ey = q.y - P.y, er = Math.hypot(ex, ey); if (er > 70) { P.x = q.x; P.y = q.y; } else if (er > 35) { P.x += ex * .25; P.y += ey * .25; } }
     else { P.face = q.f; const nw = performance.now(), ds = (nw - (P.qt || 0)) / 1000; if (P.tx !== undefined && ds > .005 && ds < .5 && Math.hypot(q.x - P.tx, q.y - P.ty) < 120) { P.vx2 = (q.x - P.tx) / ds; P.vy2 = (q.y - P.ty) / ds; } else { P.vx2 = 0; P.vy2 = 0; } P.qt = nw; P.tx = q.x; P.ty = q.y; if (P.x === undefined || Math.hypot(P.x - q.x, P.y - q.y) > 150) { P.x = q.x; P.y = q.y; } }
   });
@@ -1163,7 +1374,7 @@ function applySnap(d) {
 }
 function guestUpdate(dt) {
   time += dt; if (shake > 0) shake -= dt;
-  const [vx, vy] = inputVec(); stepWolf(wolf, vx, vy, dt);
+  if (!wolf.down) { const [vx, vy] = inputVec(); stepWolf(wolf, vx, vy, dt); }
   const nw = performance.now(), k = 1 - Math.exp(-16 * dt);
   for (const P of players) if (P.on && P !== wolf && P.tx !== undefined) { const ex = Math.min(.16, (nw - P.qt) / 1000), gx = P.tx + (P.vx2 || 0) * ex, gy = P.ty + (P.vy2 || 0) * ex; P.x += (gx - P.x) * k; P.y += (gy - P.y) * k; P.moving = Math.hypot(gx - P.x, gy - P.y) > 2 || Math.hypot(P.vx2 || 0, P.vy2 || 0) > 20; }
   for (const e of rivals) if (e.qx !== undefined) { const ex = Math.min(.16, (nw - e.qt) / 1000), gx = e.qx + (e.v2x || 0) * ex, gy = e.qy + (e.v2y || 0) * ex; e.x += (gx - e.x) * k; e.y += (gy - e.y) * k; }
@@ -1172,35 +1383,70 @@ function guestUpdate(dt) {
   popups.forEach(p => { p.y -= 34 * dt; p.life -= dt; }); popups = popups.filter(p => p.life > 0);
 }
 function netTick(dt) {
-  if (!net.role || !net.joined) return;
-  net.ping += dt; if (net.ping >= 1) { net.ping = 0; netSend({ t: 'pg' }); }
-  if (performance.now() - net.lastRx > 6000) { netLost(); return; }
-  net.acc += dt; if (net.acc < (net.via === 'relay' ? 1 / 16 : 1 / 30)) return; net.acc = 0;
-  if (net.role === 'host') { if (['play', 'cleared', 'over', 'final'].includes(scene)) netSend(buildSnap()); }
-  else if (net.role === 'guest' && scene === 'play') { const [vx, vy] = inputVec(); netSend({ t: 'in', vx: +vx.toFixed(2), vy: +vy.toFixed(2) }); }
+  if (!net.role) return;
+  const now = performance.now();
+  if (net.role === 'host') {
+    net.ping += dt;
+    if (net.ping >= 1) { net.ping = 0; hostBroadcast({ t: 'pg' }); if (!net.started) lobbyBroadcast(); }
+    for (const i of slotIds()) { const sl = net.slots[i]; if (now - sl.lastRx > 7000) dropSlot(i, sl); }
+    if (!net.started || !slotIds().length) return;
+    const relay = slotIds().some(i => net.slots[i].conn.mq);
+    net.acc += dt; if (net.acc < (relay ? 1 / 16 : 1 / 30)) return; net.acc = 0;
+    if (['play', 'cleared', 'over', 'final'].includes(scene)) hostBroadcast(buildSnap());
+  } else if (net.role === 'guest') {
+    net.ping += dt; if (net.ping >= 1) { net.ping = 0; netSend({ t: 'pg' }); }
+    if (now - net.lastRx > 6500) { netLost(); return; }
+    if (scene !== 'play') return;
+    net.acc += dt; if (net.acc < (net.via === 'relay' ? 1 / 20 : 1 / 30)) return; net.acc = 0;
+    const [vx, vy] = inputVec(); netSend({ t: 'in', vx: +vx.toFixed(2), vy: +vy.toFixed(2) });
+  }
+}
+function codeSlots(x0, y0, w, h, gap, code, size) { for (let i = 0; i < 4; i++) { const x = x0 + i * (w + gap); ctx.fillStyle = 'rgba(255,255,255,.1)'; rr(x, y0, w, h, 14); ctx.fill(); ctx.strokeStyle = code[i] ? '#9be36b' : 'rgba(255,255,255,.3)'; ctx.lineWidth = 3; ctx.stroke(); if (code[i]) txt(code[i], x + w / 2, y0 + h / 2 + 2, size, '#fff', 'center', '900'); } }
+const ROW_Y = r => 214 + r * 58;
+function lobbyRows() {
+  if (net.role === 'host') return [{ n: myNick, k: skinW, r: 1, v: 'h' }].concat(okSlots().map(i => { const s2 = net.slots[i]; return { n: s2.nick, k: s2.skin, r: s2.ready ? 1 : 0, v: s2.conn.mq ? 'r' : 'd', s: i }; }));
+  return net.lb || [];
+}
+function drawLobby() {
+  const host = net.role === 'host', rows = lobbyRows();
+  panel(70, 50, 820, 500);
+  if (host) { txt('ODA KODU', W / 2, 80, 22, '#9be36b'); codeSlots(341, 98, 62, 70, 10, net.code.padEnd(4, ' ').split('').map(c => c.trim()), 46); }
+  else txt('ODADASIN ✔', W / 2, 100, 36, '#9be36b', 'center', '900');
+  const bad = /hata|ulaşıl|koptu|ulaşılamadı/i.test(net.status);
+  txt(net.status || (host ? (net.joined ? 'Herkes HAZIR olunca BAŞLA açılır.' : 'Arkadaşların "ODAYA GİR" diyip bu kodu yazsın. En fazla 4 kişi.') : 'Hazır olunca HAZIRIM\'a bas. Host başlatınca oyun açılır.'), W / 2, 190, 18, bad ? '#ff9a9a' : '#cfe6d4', 'center', '700', false);
+  for (let r = 0; r < 4; r++) {
+    const y = ROW_Y(r), p = rows[r], me = host ? r === 0 : (p && p.s === net.slot);
+    ctx.fillStyle = p ? (me ? 'rgba(80,160,255,.22)' : 'rgba(255,255,255,.09)') : 'rgba(255,255,255,.04)'; rr(100, y, 760, 52, 14); ctx.fill();
+    ctx.strokeStyle = p ? NICK_COL[r] : 'rgba(255,255,255,.15)'; ctx.lineWidth = 2; ctx.stroke();
+    if (!p) { txt('— boş —', 480, y + 27, 18, 'rgba(255,255,255,.3)', 'center', '600', false); continue; }
+    wolfSprite(140, y + 30, .5, 1, WOLF_SKINS[clamp(p.k | 0, 0, WOLF_SKINS.length - 1)], time, false);
+    txt(p.n + (r === 0 ? '  👑' : '') + (me ? '  (sen)' : ''), 185, y + 27, 22, NICK_COL[r], 'left', '900');
+    if (host && r > 0) txt(p.v === 'r' ? '🛰️ yedek hat' : '⚡ direkt', 540, y + 27, 14, 'rgba(255,255,255,.55)', 'center', '600', false);
+    txt(r === 0 ? 'HOST' : (p.r ? 'HAZIR ✔' : 'bekliyor…'), 700, y + 27, 20, r === 0 ? '#ffe08a' : (p.r ? '#9be36b' : '#d0d6dc'), 'center', '900');
+  }
+  if (host) { txt('Başlangıç: Bölüm ' + (net.startL + 1) + ' · ' + LEVELS[net.startL].name, W / 2, 462, 18, '#ffe08a', 'center', '800', false); }
+  else if (net.lb && net.lb.length) txt('Başlangıç: Bölüm ' + (net.startL + 1) + ' · ' + LEVELS[clamp(net.startL | 0, 0, LEVELS.length - 1)].name, W / 2, 462, 18, '#ffe08a', 'center', '800', false);
 }
 function drawNet() {
   ctx.drawImage(bgCache0, 0, 0, W, H); ctx.fillStyle = 'rgba(0,0,0,.62)'; ctx.fillRect(0, 0, W, H);
-  const bad = /hata|ulaşıl|bulunamadı|koptu|yüklenemedi|Bağlanılamadı|desteklem/i.test(net.status), sc2 = bad ? '#ff9a9a' : '#bfe9c9';
-  const slots = (x0, y0, w, h, gap, code, size) => { for (let i = 0; i < 4; i++) { const x = x0 + i * (w + gap); ctx.fillStyle = 'rgba(255,255,255,.1)'; rr(x, y0, w, h, 14); ctx.fill(); ctx.strokeStyle = code[i] ? '#9be36b' : 'rgba(255,255,255,.3)'; ctx.lineWidth = 3; ctx.stroke(); if (code[i]) txt(code[i], x + w / 2, y0 + h / 2 + 2, size, '#fff', 'center', '900'); } };
+  const bad = /hata|ulaşıl|bulunamadı|koptu|yüklenemedi|Bağlanılamadı|desteklem|dolu|attı|başlamış/i.test(net.status), sc2 = bad ? '#ff9a9a' : '#bfe9c9';
   if (scene === 'online') {
-    panel(170, 100, 620, 350); txt('👥 ÇEVRİMİÇİ CO-OP', W / 2, 155, 40, '#fff', 'center', '900');
-    wrap('Arkadaşınla aynı kurt takımında oyna. Biri oda kurar ve kodu söyler, diğeri kodla girer.', W / 2, 212, 520, 28, 20, '#cfe6d4', 'center');
-    txt('4 can ortak · matcha ortak · her biri kendi skiniyle', W / 2, 430, 17, 'rgba(255,255,255,.6)', 'center', '600', false);
-  } else if (scene === 'host') {
-    panel(110, 70, 740, 470); txt('ODA KODU', W / 2, 112, 26, '#9be36b');
-    slots(279, 138, 90, 100, 14, net.code.padEnd(4, ' ').split('').map(c => c.trim()), 68);
-    txt(net.joined ? 'Oyuncu 2 bağlandı ✔' : net.status, W / 2, 285, 24, net.joined ? '#9be36b' : sc2);
-    if (!net.joined) wrap('Arkadaşın "ODAYA GİR" diyip bu kodu yazsın.', W / 2, 335, 560, 30, 21, '#cfe6d4', 'center');
-    else { txt('Başlangıç: Bölüm ' + (net.startL + 1) + ' · ' + LEVELS[net.startL].name, W / 2, 360, 24, '#ffe08a'); }
-  } else if (scene === 'join') {
+    panel(170, 100, 620, 380); txt('👥 ÇEVRİMİÇİ CO-OP', W / 2, 150, 40, '#fff', 'center', '900');
+    wrap('En fazla 4 kişi. Biri oda kurar ve kodu söyler, diğerleri kodla girer. Herkes HAZIR olunca host başlatır.', W / 2, 205, 520, 28, 19, '#cfe6d4', 'center');
+    txt('Her oyuncunun kendi canı var · yere düşeni arkadaşı 1 sn\'de kaldırır', W / 2, 466, 16, 'rgba(255,255,255,.6)', 'center', '600', false);
+    if (net.status) txt(net.status, W / 2, 252, 20, sc2);
+  } else if (scene === 'nick') {
+    panel(70, 40, 820, 520); txt('NİCK SEÇ', W / 2, 78, 34, '#9be36b', 'center', '900');
+    ctx.fillStyle = 'rgba(255,255,255,.1)'; rr(300, 104, 360, 62, 14); ctx.fill(); ctx.strokeStyle = '#9be36b'; ctx.lineWidth = 3; ctx.stroke();
+    txt(myNick + (Math.floor(time * 2) % 2 ? '_' : ''), W / 2, 137, 36, '#fff', 'center', '900');
+    txt('Ekrandaki tuşlarla ya da klavyeyle yaz (en fazla 10 karakter)', W / 2, 186, 16, 'rgba(255,255,255,.6)', 'center', '600', false);
+  } else if (scene === 'host' || scene === 'lobbyG') drawLobby();
+  else if (scene === 'join') {
     panel(60, 66, 840, 500); txt('ODA KODUNU GİR', W / 2, 105, 28, '#9be36b');
-    slots(322, 128, 70, 76, 12, joinCode.padEnd(4, ' ').split('').map(c => c.trim()), 52);
-    txt(net.status || 'Arkadaşının ekranındaki 4 haneli kodu yaz.', W / 2, 228, 20, net.status ? sc2 : 'rgba(255,255,255,.7)', 'center', '600', false);
-  } else if (scene === 'lobbyG') {
-    panel(170, 130, 620, 300); txt('BAĞLANDI ✔', W / 2, 190, 48, '#9be36b', 'center', '900'); wrap('Host oyunu başlatınca oyun açılacak. Hazır ol, kurt!', W / 2, 260, 520, 32, 24, '#e8f3ea', 'center');
+    codeSlots(322, 128, 70, 76, 12, joinCode.padEnd(4, ' ').split('').map(c => c.trim()), 52);
+    txt(net.status || 'Host\'un ekranındaki 4 haneli kodu yaz.', W / 2, 228, 20, net.status ? sc2 : 'rgba(255,255,255,.7)', 'center', '600', false);
   } else if (scene === 'netlost') {
-    panel(170, 130, 620, 300); txt('BAĞLANTI KOPTU', W / 2, 200, 46, '#ff9a9a', 'center', '900'); wrap('Arkadaşın odadan çıktı ya da internet gitti.', W / 2, 270, 520, 32, 24, '#e8f3ea', 'center');
+    panel(170, 130, 620, 300); txt('BAĞLANTI SONA ERDİ', W / 2, 200, 42, '#ff9a9a', 'center', '900'); wrap(net.status || 'Bağlantı koptu ya da oda kapandı.', W / 2, 270, 520, 32, 24, '#e8f3ea', 'center');
   }
 }
 
@@ -1213,7 +1459,7 @@ function setBtns() {
     const setMode = m => { storyMode = m; try { localStorage.setItem('matchaMode', m ? 'story' : 'classic'); } catch (e) { } };
     B(W / 2 - 190, 284, 380, 58, prog ? '📖 HİKAYE · DEVAM ET' : '📖 HİKAYE MODU', () => { setMode(true); beginLevelFlow(progress); }, '#3fae5a');
     B(W / 2 - 190, 348, 380, 50, '🎮 KLASİK MOD (hikayesiz)', () => { setMode(false); L = progress; scene = 'story'; setBtns(); }, '#2c8f8f');
-    B(W / 2 - 190, 404, 380, 50, '👥 ÇEVRİMİÇİ CO-OP (oda kodu)', () => { net.status = ''; scene = 'online'; setBtns(); }, '#d0701f');
+    B(W / 2 - 190, 404, 380, 50, '👥 ÇEVRİMİÇİ CO-OP (4 kişi)', () => { net.status = ''; scene = 'online'; setBtns(); }, '#d0701f');
     B(W / 2 - 190, 460, 380, 50, '🎨 SKİNLER', () => { scene = 'skins'; setBtns(); }, '#9a4fc4');
     if (prog) {
       B(W / 2 - 190, 516, 185, 46, 'BAŞTAN', () => { progress = 0; saveProg(); score = 0; setMode(true); beginLevelFlow(0); }, '#2c6fb0');
@@ -1243,23 +1489,41 @@ function setBtns() {
       btns.push({ x: 600, y: 492, w: 215, h: 48, fn: () => { }, render: () => txt('Sayfa ' + (skinPage + 1) + ' / ' + pages, 707, 516, 20, '#e6f3ea', 'center', '700', false) });
     }
   } else if (scene === 'online') {
-    B(W / 2 - 160, 268, 320, 64, '🏠 ODA KUR', () => { scene = 'host'; hostRoom(0); setBtns(); }, '#3fae5a');
-    B(W / 2 - 160, 344, 320, 64, '🔑 ODAYA GİR', () => { scene = 'join'; joinCode = ''; net.status = ''; setBtns(); }, '#2c6fb0');
+    B(W / 2 - 160, 262, 320, 60, '🏠 ODA KUR', () => { scene = 'host'; net.status = ''; hostRoom(0); setBtns(); }, '#3fae5a');
+    B(W / 2 - 160, 332, 320, 60, '🔑 ODAYA GİR', () => { scene = 'join'; joinCode = ''; net.status = ''; setBtns(); }, '#2c6fb0');
+    B(W / 2 - 160, 402, 320, 46, '✏️ NİCK: ' + myNick, () => { scene = 'nick'; nickFresh = true; setBtns(); }, '#9a4fc4');
     B(24, 24, 140, 52, '‹ GERİ', () => { scene = 'menu'; setBtns(); }, '#555a66');
+  } else if (scene === 'nick') {
+    const keys2 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ÇĞİÖŞÜ'.split('');
+    keys2.forEach((ch, i) => B(110 + (i % 11) * 70, 214 + Math.floor(i / 11) * 62, 64, 54, ch, () => { if (nickFresh) { myNick = ''; nickFresh = false; } if (myNick.length < 10) { myNick += ch; setBtns(); } }, '#3a5a8a'));
+    B(110, 470, 220, 56, '⌫ SİL', () => { myNick = myNick.slice(0, -1); setBtns(); }, '#8a4a3a');
+    B(350, 470, 220, 56, '🎲 RASTGELE', () => { myNick = pick(['KURT', 'SIGMA', 'GIGA', 'MATCHA', 'BRO', 'AURA', 'DOLAP', 'TAKTAK']) + (10 + Math.floor(Math.random() * 90)); setBtns(); }, '#6a5a8a');
+    B(590, 470, 260, 56, 'TAMAM ✔', () => { myNick = cleanNick(myNick) || 'KURT'; saveNick(); scene = 'online'; setBtns(); }, '#3fae5a');
   } else if (scene === 'host') {
     B(24, 24, 140, 52, '‹ ÇIK', leaveNet, '#555a66');
-    if (net.joined) {
-      B(W / 2 - 215, 392, 90, 50, '◀', () => { net.startL = (net.startL + LEVELS.length - 1) % LEVELS.length; }, '#3a4a40');
-      B(W / 2 + 125, 392, 90, 50, '▶', () => { net.startL = (net.startL + 1) % LEVELS.length; }, '#3a4a40');
-      B(W / 2 - 170, 456, 340, 66, 'BAŞLA  ▶', () => startLevel(net.startL), '#3fae5a');
-    }
+    B(W / 2 - 330, 478, 70, 52, '◀', () => { net.startL = (net.startL + LEVELS.length - 1) % LEVELS.length; lobbyBroadcast(); }, '#3a4a40');
+    B(W / 2 - 250 + 0, 478, 0, 0, '', () => { }, '#000');
+    btns.pop();
+    B(W / 2 + 260, 478, 70, 52, '▶', () => { net.startL = (net.startL + 1) % LEVELS.length; lobbyBroadcast(); }, '#3a4a40');
+    btns.push({ x: W / 2 - 240, y: 474, w: 490, h: 60, fn: () => hostStart(), render: b => {
+      const ok = allReady(); ctx.fillStyle = 'rgba(0,0,0,.35)'; rr(b.x + 3, b.y + 6, b.w, b.h, 18); ctx.fill(); ctx.fillStyle = ok ? '#3fae5a' : '#4a5058'; rr(b.x, b.y, b.w, b.h, 18); ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 2; ctx.stroke();
+      const nrd = okSlots().filter(i => !net.slots[i].ready).length;
+      txt(ok ? 'BAŞLA  ▶' : (okSlots().length ? nrd + ' kişi hazır değil' : 'Oyuncu bekleniyor...'), b.x + b.w / 2, b.y + b.h / 2 + 1, 28, ok ? '#fff' : '#b8bec6');
+    } });
+    for (let r = 1; r < 4; r++) btns.push({ x: 806, y: ROW_Y(r) + 6, w: 44, h: 40, fn: () => { const id = okSlots()[r - 1]; if (id) kickSlot(id); }, render: b => {
+      if (!okSlots()[r - 1]) return; ctx.fillStyle = '#b8402f'; rr(b.x, b.y, b.w, b.h, 10); ctx.fill(); txt('✖', b.x + b.w / 2, b.y + b.h / 2 + 1, 22, '#fff', 'center', '900', false); } });
   } else if (scene === 'join') {
     B(24, 24, 140, 52, '‹ GERİ', leaveNet, '#555a66');
     CODE_CH.split('').forEach((ch, i) => B(148 + (i % 7) * 96, 248 + Math.floor(i / 7) * 62, 88, 54, ch, () => { if (joinCode.length < 4) joinCode += ch; }, '#3a5a8a'));
     B(148, 500, 200, 50, '⌫ SİL', () => { joinCode = joinCode.slice(0, -1); }, '#8a4a3a');
     B(612, 500, 200, 50, 'GİR ▶', tryJoin, '#3fae5a');
-  } else if (scene === 'lobbyG' || scene === 'netlost') {
-    B(W / 2 - 150, 400, 300, 60, scene === 'netlost' ? 'MENÜ' : 'ODADAN ÇIK', leaveNet, '#555a66');
+  } else if (scene === 'lobbyG') {
+    B(24, 24, 140, 52, '‹ ÇIK', leaveNet, '#555a66');
+    btns.push({ x: W / 2 - 200, y: 484, w: 400, h: 58, fn: () => { net.ready = !net.ready; netSend({ t: 'rd', v: net.ready ? 1 : 0 }); }, render: b => {
+      ctx.fillStyle = 'rgba(0,0,0,.35)'; rr(b.x + 3, b.y + 6, b.w, b.h, 18); ctx.fill(); ctx.fillStyle = net.ready ? '#3fae5a' : '#d0701f'; rr(b.x, b.y, b.w, b.h, 18); ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 2; ctx.stroke();
+      txt(net.ready ? 'HAZIRSIN ✔  (iptal için dokun)' : 'HAZIRIM!', b.x + b.w / 2, b.y + b.h / 2 + 1, 26, '#fff'); } });
+  } else if (scene === 'netlost') {
+    B(W / 2 - 150, 400, 300, 60, 'MENÜ', leaveNet, '#555a66');
   } else if (scene === 'cut') {
     B(W - 164, 18, 146, 48, 'GEÇ  ⏭', skipCut, '#555a66');
   } else if (scene === 'story') {
@@ -1300,18 +1564,23 @@ function drawMinimap() {
   matchas.forEach(m => { ctx.fillStyle = m.gold ? '#ffd84a' : '#9be36b'; ctx.beginPath(); ctx.arc(mx + m.x * k, my + m.y * k, 2.2, 0, 7); ctx.fill(); });
   rivals.forEach(e => { if (e.type === 'queue') return; if (e.type === 'dolmus' && e.st !== 2) return; ctx.fillStyle = '#ff5d5d'; ctx.beginPath(); ctx.arc(mx + e.x * k, my + e.y * k, 3, 0, 7); ctx.fill(); });
   if (princess) { ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.arc(mx + princess.x * k, my + princess.y * k, 4.5, 0, 7); ctx.fill(); }
-  players.forEach(P => { if (!P.on) return; ctx.fillStyle = P === wolf ? '#fff' : '#ffb36b'; ctx.beginPath(); ctx.arc(mx + P.x * k, my + P.y * k, 3.4, 0, 7); ctx.fill(); });
+  players.forEach(P => { if (!P.on) return; ctx.fillStyle = P.down ? '#777' : P === wolf ? '#fff' : '#ffb36b'; ctx.beginPath(); ctx.arc(mx + P.x * k, my + P.y * k, 3.4, 0, 7); ctx.fill(); });
   ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.lineWidth = 1; ctx.strokeRect(mx + cam.x * k, my + cam.y * k, W * k, H * k);
   ctx.restore();
 }
 function drawHUD() {
   const lv = LEVELS[L];
   ctx.fillStyle = 'rgba(10,25,15,.62)'; rr(10, 8, W - 20, 62, 16); ctx.fill();
-  for (let i = 0; i < maxLives; i++) emoji(i < lives ? '❤️' : '🖤', 40 + i * 40, 39, 28);
+  if (net.role) { for (let i = 0; i < 3; i++) emoji(i < Math.max(0, wolf.hp) ? '❤️' : '🖤', 40 + i * 40, 39, 28); }
+  else for (let i = 0; i < maxLives; i++) emoji(i < lives ? '❤️' : '🖤', 40 + i * 40, 39, 28);
+  if (net.role) {
+    let ty = 84; players.forEach((P, pi) => { if (P === wolf || !P.on) return; ctx.fillStyle = 'rgba(10,25,15,.55)'; rr(12, ty - 13, 168, 26, 10); ctx.fill(); txt((P.nick || 'P' + (pi + 1)).slice(0, 9), 20, ty, 13, NICK_COL[pi % 4], 'left', '800', false); txt(P.down ? '💀 yerde' : '❤'.repeat(Math.max(0, P.hp)), 172, ty, 13, P.down ? '#ff9a9a' : '#ff6b8a', 'right', '800', false); ty += 30; });
+    if (wolf.down) { ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(0, 0, W, H); txt('YERDESİN!', W / 2, H / 2 - 40, 64, '#ff9a9a', 'center', '900'); txt('Bir arkadaşın yanına gelip 1 saniye durunca kalkarsın', W / 2, H / 2 + 10, 24, '#fff'); ctx.strokeStyle = '#9be36b'; ctx.lineWidth = 10; ctx.beginPath(); ctx.arc(W / 2, H / 2 + 80, 30, -Math.PI / 2, -Math.PI / 2 + Math.min(1, wolf.rv) * 6.283); ctx.stroke(); }
+  }
   txt('Bölüm ' + (L + 1) + ' · ' + lv.name, W / 2, 24, 22, '#fff');
   const bw = 320, bx = W / 2 - bw / 2, by = 44; ctx.fillStyle = 'rgba(255,255,255,.18)'; rr(bx, by, bw, 16, 8); ctx.fill();
-  const k = Math.min(1, got / lv.quota); if (k > 0) { const g = ctx.createLinearGradient(bx, 0, bx + bw, 0); g.addColorStop(0, '#9be36b'); g.addColorStop(1, '#3fae5a'); ctx.fillStyle = g; rr(bx, by, Math.max(16, bw * k), 16, 8); ctx.fill(); }
-  txt('🍵 ' + Math.min(got, lv.quota) + ' / ' + lv.quota, W / 2, by + 8, 13, '#fff', 'center', '800', false);
+  const k = Math.min(1, got / Q()); if (k > 0) { const g = ctx.createLinearGradient(bx, 0, bx + bw, 0); g.addColorStop(0, '#9be36b'); g.addColorStop(1, '#3fae5a'); ctx.fillStyle = g; rr(bx, by, Math.max(16, bw * k), 16, 8); ctx.fill(); }
+  txt('🍵 ' + Math.min(got, Q()) + ' / ' + Q(), W / 2, by + 8, 13, '#fff', 'center', '800', false);
   txt('Aura ' + score, W - 140, 39, 22, '#ffe08a', 'right');
   [[pauseBtn, paused ? '▶' : '❚❚'], [muteBtn, muted ? '🔇' : '🔊']].filter(a => !(net.role && a[0] === pauseBtn)).forEach(([b, ic]) => { ctx.fillStyle = 'rgba(255,255,255,.16)'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill(); ic.length > 1 && ic !== '❚❚' ? emoji(ic, b.x, b.y + 1, 22) : txt(ic, b.x, b.y + 1, 18, '#fff', 'center', '900', false); });
   if (princess) { const a = Math.atan2(princess.y - wolf.y, princess.x - wolf.x), sx = wolf.x - cam.x, sy = wolf.y - cam.y; ctx.save(); ctx.translate(sx + Math.cos(a) * 44, sy + Math.sin(a) * 44); ctx.rotate(a); ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-6, -8); ctx.lineTo(-6, 8); ctx.closePath(); ctx.fill(); ctx.restore(); txt('Prenses\'e git!  (' + Math.round(dist(princess, wolf) / 10) + ' m)', W / 2, FIELD_TOP + 14, 22, '#ffe08a'); }
@@ -1347,7 +1616,7 @@ function drawMenu() {
 function drawStory() {
   ctx.drawImage(getBG(L), 0, 0, W, H); ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(0, 0, W, H);
   const lv = LEVELS[L]; panel(110, 90, 740, 360);
-  txt('BÖLÜM ' + (L + 1) + ' / ' + LEVELS.length, W / 2, 135, 24, '#9be36b');
+  txt('PERDE ' + (chapterOf(L) + 1) + ': ' + CHAPTERS[chapterOf(L)].name.toUpperCase() + '  ·  BÖLÜM ' + (L + 1) + ' / ' + LEVELS.length, W / 2, 135, 22, '#9be36b');
   txt(lv.name, W / 2, 190, 52, '#fff', 'center', '900');
   txt(lv.rivalName ? '⚠ Rakip: ' + lv.rivalName : '☮ Rakip yok', W / 2, 245, 26, lv.rivalName ? '#ff9a9a' : '#bfe9c9');
   wrap(lv.intro, W / 2, 300, 640, 34, 24, '#e8f3ea', 'center');
@@ -1376,7 +1645,7 @@ let bgCache0 = getBG(0);
 /* ---------- ana çizim ---------- */
 function draw() {
   ctx.save(); ctx.clearRect(0, 0, W, H);
-  if (scene === 'menu') drawMenu(); else if (scene === 'skins') drawSkins(); else if (scene === 'cut') drawCut(); else if (['online', 'host', 'join', 'lobbyG', 'netlost'].includes(scene)) drawNet(); else if (scene === 'story') drawStory(); else if (scene === 'final') drawFinal();
+  if (scene === 'menu') drawMenu(); else if (scene === 'skins') drawSkins(); else if (scene === 'cut') drawCut(); else if (['online', 'host', 'join', 'lobbyG', 'netlost', 'nick'].includes(scene)) drawNet(); else if (scene === 'story') drawStory(); else if (scene === 'final') drawFinal();
   else {
     if (shake > 0) ctx.translate(rand(-5, 5) * shake * 3, rand(-5, 5) * shake * 3);
     updateCam(); ctx.translate(-cam.x, -cam.y);
@@ -1426,6 +1695,7 @@ function keyOf(e) { return codeMap[e.code] || e.key.toLowerCase(); }
 window.addEventListener('keydown', e => {
   const k = keyOf(e); keys[k] = true; audioInit();
   if (scene === 'join') { const u = e.key.toUpperCase(); if (u === 'BACKSPACE') joinCode = joinCode.slice(0, -1); else if (u === 'ENTER') tryJoin(); else if (u.length === 1 && CODE_CH.includes(u) && joinCode.length < 4) joinCode += u; }
+  if (scene === 'nick') { if (e.key === 'Backspace') { myNick = myNick.slice(0, -1); setBtns(); } else if (e.key === 'Enter') { myNick = cleanNick(myNick) || 'KURT'; saveNick(); scene = 'online'; setBtns(); } else if (e.key.length === 1 && /[A-Za-z0-9ÇĞİÖŞÜçğıöşü]/.test(e.key) && (nickFresh || myNick.length < 10)) { if (nickFresh) { myNick = ''; nickFresh = false; } myNick += e.key.toLocaleUpperCase('tr'); setBtns(); } e.preventDefault(); return; }
   if (scene === 'cut' && !e.repeat && (k === ' ' || k === 'e' || k === 'enter')) advanceCut();
   if ((k === 'e' || k === ' ') && !e.repeat) doDash();
   if (k === 'p' && !e.repeat && scene === 'play' && !net.role) paused = !paused;
