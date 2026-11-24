@@ -2,6 +2,8 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
+<meta name="author" content="KUDEPI">
+<title>Matcha Avı · KUDEPI</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <style>
   html,body{margin:0;height:100%;background:#0d1a12;overflow:hidden;touch-action:none;
@@ -86,116 +88,147 @@ const sfx = {
 
 /* ---------- bölümler ---------- */
 const LEVELS = [
-  { name: 'Gabar Yamacı', quota: 6, rivals: [], rivalName: null,
+  { name: 'Gabar Yamacı: Tutorial Arc', quota: 6, rivals: [], rivalName: null,
     intro: 'Gabar Dağları\'nın eteğinde matcha kasesi dolu. Kurt, prensesi kurtarmak için kaseleri toplamalı. Bu bölümde rakip yok, ısın!',
-    win: 'Prenses kuleden indi. "İlk bölümde rakip yoktu, ama bundan sonrası zor," diyor.' },
-  { name: 'Sahur Vakti', quota: 8, rivals: ['drummer', 'cat'], rivalName: 'Tak Tak Sahurcu + Hırsız Kedi',
+    win: 'Prenses kuleden indi. "İlk bölümde rakip yoktu, bu normal değil, kızıl bir şeyler dönüyor," dedi. Kimse dinlemedi.' },
+  { name: 'Tung Tak Tak: Sahur Arc', quota: 8, rivals: ['drummer', 'cat'], rivalName: 'Tung Tak Sahurcu + Matcha Hırsızı Kedi',
     intro: 'Davulun şok dalgasına değme! Kedi matchaları kapıp kaçıyor: yakalarsan matchayı geri alırsın.',
-    win: 'Sahurcu davulu kafasına geçirdi. Prenses: "Sahura daha çok var, devam!"' },
-  { name: 'Milyarlık Vurgun', quota: 10, rivals: ['fund', 'dolmus'], rivalName: 'Kraliçe Vurgun + Dolmuş Şoförü',
+    win: 'Sahurcu davulu kafasına geçirdi. Komşular şikayetçi, apartman yöneticisi gruptan çıktı.' },
+  { name: 'Kripto Rug Pull', quota: 10, rivals: ['fund', 'dolmus'], rivalName: 'Kripto Abla + Dolmuş Abi (Müzik Açık)',
     intro: 'Bozuk paralardan kaç! Kırmızı şerit yanarsa dolmuş geçecek: şeritten çık!',
-    win: 'Kraliçe Vurgun "fon kapandı" diyerek kaçtı. Prenses: "Hesap sorulacak!"' },
-  { name: 'Bombardıman Havuzu', quota: 12, rivals: ['croc', 'kargo'], rivalName: 'Bombardıman Timsahı + Kargo Kuryesi',
+    win: 'Kripto Abla "bu bir finansal tavsiye değil" yazıp sessizce adını değiştirdi. Rug pull\'u gören yok.' },
+  { name: 'Bombardiro Havuz Partisi', quota: 12, rivals: ['croc', 'kargo'], rivalName: 'Bombardiro Timsahı + Hep "Dağıtımda" Kurye',
     intro: 'Kırmızı halkalardan çık! Kuryenin bıraktığı paketler 2 saniye sonra patlıyor.',
-    win: 'Timsah bombasını kendi üstüne düşürdü. Prenses: "Çanta çanta matcha var, bırakma."' },
-  { name: 'Kapuçino Balerini', quota: 12, rivals: ['ballerina', 'drummer', 'teyze'], rivalName: 'Balerin + Sahurcu + Poşet Teyze',
+    win: 'Timsah bombasını kendi havuzuna attı. Havuz partisi iptal, yalnızca "fotoğraf bırakın" kaldı.' },
+  { name: 'Kapuçino Balerina Mesaisi', quota: 12, rivals: ['ballerina', 'drummer', 'teyze'], rivalName: 'Balerin + Sahurcu + Pazarlıkçı Teyze',
     intro: 'Balerin ışınlanıyor, Sahurcu davul vuruyor, teyzenin poşeti gidip geri geliyor. İki kere dikkat!',
-    win: 'Balerin piruetten başı döndü, yere yığıldı. Prenses alkışlıyor.' },
-  { name: 'Zam Fırtınası', quota: 14, rivals: ['zam', 'fund', 'cat'], rivalName: 'Zam Canavarı + Vurgun + Hırsız Kedi',
+    win: 'Balerina piruetten başı döndü. Mesai saati bitti, kapuçino de.' },
+  { name: 'Enflasyon Arc', quota: 14, rivals: ['zam', 'fund', 'cat'], rivalName: 'Enflasyon Goblini + Vurgun + Matcha Hırsızı Kedi',
     intro: 'Zam etiketleri peşinde, para yağıyor, kedi matcha çalıyor. Hızlı topla!',
-    win: 'Zam Canavarı "indirim" kelimesini duyunca patladı. Prenses: "Daha bitmedi."' },
-  { name: 'Matcha Mafyası', quota: 16, rivals: ['fund', 'croc', 'ballerina', 'drummer', 'dolmus'], rivalName: 'Matcha Mafyası ve Çetesi',
+    win: 'Enflasyon Goblini "indirim" kelimesini duyunca patladı. Etiket: 0,00 TL. Tabii ki şaka.' },
+  { name: 'Sigma Mafya Boss Fight', quota: 16, rivals: ['fund', 'croc', 'ballerina', 'drummer', 'dolmus'], rivalName: 'Sigma Matcha Mafyası ve Çetesi',
     intro: 'Bütün çete birleşti: para, bomba, balerin, davul ve dolmuş. Dikkat et, kurt!',
-    win: 'Mafya dağıldı. Ama dağın arkasında neon bir tabela yandı: "NEVADA KAHVE".' },
-  { name: 'Nevada Şubesi No:1', quota: 14, rivals: ['barista', 'kargo'], rivalName: 'Stajyer Barista + Kargo Kuryesi',
-    intro: 'Stajyer Barista sıcak fincan fırlatıyor. Fincan düşünce yere yapışkan latte döküyor: içinde yavaşlarsın. Kırmızı hedefe dikkat!',
-    win: 'Stajyer ilk zam gününde istifa etti. Prenses: "Bu şube kapanıyor mu?" "Hayır, yenisi açılıyor."' },
-  { name: 'Sonsuz Kuyruk', quota: 14, rivals: ['queue', 'teyze'], rivalName: 'Kuyruktaki Adam + Poşet Teyze',
+    win: 'Mafya dağıldı. Ama dağın arkasında neon bir tabela yandı: NEVADA KAHVE. Aura +9999.' },
+  { name: 'Nevada Şubesi (Only in Ohio)', quota: 14, rivals: ['barista', 'kargo'], rivalName: 'Maaşsız Barista + Hep "Dağıtımda" Kurye',
+    intro: 'Maaşsız Barista sıcak fincan fırlatıyor. Fincan düşünce yere yapışkan latte döküyor: içinde yavaşlarsın. Kırmızı hedefe dikkat!',
+    win: 'Stajyer ilk zam gününde istifa etti, LinkedIn\'e "yeni bir yolculuk" yazdı. Kimse beğenmedi.' },
+  { name: 'Sıradaki NPC Kuyruğu', quota: 14, rivals: ['queue', 'teyze'], rivalName: 'Sıradaki NPC + Pazarlıkçı Teyze',
     intro: 'Sonsuz kuyruk çölde kıvrılıp duruyor. Kuyruğun hiçbir yerine değme, aralarından kaç!',
-    win: 'Kuyruk dağıldı. Herkes yeniden başa sarıp sıraya girdi.' },
-  { name: 'Fiyat Güncellemesi', quota: 16, rivals: ['zam', 'barista', 'dolmus'], rivalName: 'Zam Canavarı + Barista + Dolmuş',
+    win: 'Kuyruk dağıldı. NPC\'ler başa sarıp yeniden sıraya girdi. Dialog: "Ben sıradaydım."' },
+  { name: 'Menü Zamlandı, Cope', quota: 16, rivals: ['zam', 'barista', 'dolmus'], rivalName: 'Enflasyon Goblini + Barista + Dolmuş',
     intro: 'Neon gece, yeni menü: her şey zamlı, her yer sıcak latte. Etiketlerden ve yapışkan lattelerden uzak dur!',
-    win: 'Menü yırtıldı. Prenses: "Ben matcha içmiştim, değil mi?" "Evet, ama fiyatını sorma."' },
-  { name: 'Bayilik Fırsatı', quota: 16, rivals: ['fund', 'queue', 'ballerina', 'cat'], rivalName: 'Bayilik Danışmanı + Kuyruk + Balerin + Kedi',
+    win: 'Menü yırtıldı. Prenses: "Matcha 400 TL mi?" Kurt: "Soru sorma, sadece iç."' },
+  { name: 'Bayilik Fırsatı (Piramit Değil)', quota: 16, rivals: ['fund', 'queue', 'ballerina', 'cat'], rivalName: 'Bayilik Danışmanı + Kuyruk + Balerin + Kedi',
     intro: 'Bayilik danışmanı para yağdırıyor, kuyruk dolanıyor, balerin ışınlanıyor. Üçlü kaos!',
-    win: 'Danışman "geri dönüş garantili" diyerek çöle kaçtı. Geri dönüş yok.' },
-  { name: 'Franchise Baronu', quota: 18, rivals: ['barista', 'queue', 'croc', 'baron', 'kargo', 'teyze'], rivalName: 'Franchise Baronu ve Çetesi',
-    intro: 'Franchise Baronu zam etiketleri yağdırıyor, çetesi fincan fırlatıyor, kuyruk dolanıyor, timsah bomba atıyor. Bu kez gerçekten sert!',
-    win: 'Franchise Baronu devrildi. Tabelalar sönüyor... ama uzaktan bir motor sesi geliyor.' },
-  { name: 'Çöl Otoyolu', quota: 16, rivals: ['dolmus','kargo','cat'], rivalName: 'Dolmuş + Kargo + Kedi',
+    win: 'Danışman "geri dönüş garantili" diyerek çöle kaçtı. Geri dönüş yok, sadece "networking".' },
+  { name: 'LinkedIn Baronu Boss Fight', quota: 18, rivals: ['barista', 'queue', 'croc', 'baron', 'kargo', 'teyze'], rivalName: 'LinkedIn Baronu ve Çetesi',
+    intro: 'LinkedIn Baronu zam etiketleri yağdırıyor, çetesi fincan fırlatıyor, kuyruk dolanıyor, timsah bomba atıyor. Bu kez gerçekten sert!',
+    win: 'LinkedIn Baronu devrildi. Son gönderisi: "Bugün çok şey öğrendim." 14 bin beğeni, hepsi bot.' },
+  { name: 'Çöl Otoyolu (Touch Grass)', quota: 16, rivals: ['dolmus','kargo','cat'], rivalName: 'Dolmuş + Kargo + Kedi',
     intro: 'Yeni bir bölge: Nevada İmparatorluğu! Otoyolda dolmuşlar şerit değiştiriyor, kuryeler paket bırakıyor, kedi matchanı kapıyor.',
-    win: 'Dolmuş şoförü "son durak" dedi ve kendi durağında indi.' },
-  { name: 'Otogar Kaosu', quota: 17, rivals: ['dolmus','teyze','cat'], rivalName: 'Dolmuş + Poşet Teyze + Kedi',
+    win: 'Dolmuş Abi "son durak" dedi ve kendi durağında indi. Müzik: hâlâ açık.' },
+  { name: 'Otogar: Chat Is This Real', quota: 17, rivals: ['dolmus','teyze','cat'], rivalName: 'Dolmuş + Pazarlıkçı Teyze + Kedi',
     intro: 'Otogarda herkes bir yere gidiyor, kimse varmıyor. Teyzenin poşetine dikkat, şeritlere de!',
-    win: 'Otogarın anonsu: "Matcha yok, ama kurt var."' },
-  { name: 'Kargo Deposu', quota: 18, rivals: ['kargo','kargo','fund'], rivalName: '2 Kargo Kuryesi + Vurgun',
+    win: 'Otogar anonsu: "Chat, bu gerçek mi?" Kimse cevap vermedi. Chat de gitti.' },
+  { name: 'Kargo: Hep Dağıtımda', quota: 18, rivals: ['kargo','kargo','fund'], rivalName: '2 Hep "Dağıtımda" Kurye + Vurgun',
     intro: 'Depoda iki kurye aynı anda paket bırakıyor. Üstelik bozuk para da yağıyor. Çok yönlü kaos!',
-    win: 'Kuryeler paketleri karıştırdı: herkesin siparişi herkese gitti.' },
-  { name: 'Pazar Yeri', quota: 18, rivals: ['teyze','teyze','cat','drummer'], rivalName: '2 Poşet Teyze + Kedi + Sahurcu',
+    win: 'Kuryeler paketleri karıştırdı. Herkesin siparişi herkese gitti. Hep "dağıtımda".' },
+  { name: 'Pazarlık Arc (Fanum Vergisi)', quota: 18, rivals: ['teyze','teyze','cat','drummer'], rivalName: '2 Pazarlıkçı Teyze + Kedi + Sahurcu',
     intro: 'Pazarda iki teyze poşet savuruyor, kedi tezgâhtan matcha çalıyor, sahurcu hâlâ sahurda.',
-    win: 'Teyzeler pazarlıkta anlaşamadı, poşetler hâlâ havada.' },
-  { name: 'Mahalle Düğünü', quota: 20, rivals: ['drummer','ballerina','teyze','dolmus'], rivalName: 'Davul + Balerin + Teyze + Dolmuş',
+    win: 'Teyzeler pazarlıkta anlaşamadı. Fanum vergisi alındı, hâlâ ödenmedi.' },
+  { name: 'Düğün: Main Character Syndrome', quota: 20, rivals: ['drummer','ballerina','teyze','dolmus'], rivalName: 'Davul + Balerin + Teyze + Dolmuş',
     intro: 'Düğünde davul çalıyor, balerin dans ediyor, dolmuş gelin arabası olmuş. Hepsi sana doğru.',
-    win: 'Gelin ve damat kaçtı. Matcha kaseleri düğün hediyesi sayıldı.' },
-  { name: 'Gece Seferi', quota: 20, rivals: ['dolmus','dolmus','croc'], rivalName: '2 Dolmuş + Bombardıman Timsahı',
+    win: 'Gelin damat kaçtı. Matcha kaseleri düğün hediyesi sayıldı. Main character: kurt.' },
+  { name: 'Gece 3 Seferi (Doomscroll)', quota: 20, rivals: ['dolmus','dolmus','croc'], rivalName: '2 Dolmuş + Bombardiro Timsahı',
     intro: 'Gece seferinde iki dolmuş yarışıyor, timsah da bomba atıyor. Şeritleri ve halkaları takip et!',
-    win: 'Dolmuşlar sabaha kadar yarıştı. Kazanan: yakıt tasarrufu.' },
-  { name: 'Hırsız Kediler Çetesi', quota: 20, rivals: ['cat','cat','cat','zam'], rivalName: '3 Kedi + Zam Canavarı',
+    win: 'Dolmuşlar sabaha kadar yarıştı. Kazanan: Gece 3\'te yine doomscroll eden sen.' },
+  { name: 'Emekçi Kediler Sendikası', quota: 20, rivals: ['cat','cat','cat','zam'], rivalName: '3 Kedi + Enflasyon Goblini',
     intro: 'Üç kedi aynı anda matcha çalıyor, zam canavarı fiyatları şişiriyor. Hepsini yakala!',
-    win: 'Kediler matchaları geri verdi. Hepsini değil, yarısını.' },
-  { name: 'Kuryeler Grevi', quota: 22, rivals: ['kargo','kargo','queue'], rivalName: '2 Kurye + Kuyruk',
+    win: 'Kediler matchaları geri verdi. Yarısını. Sendikaya aidat yatırıldı.' },
+  { name: 'Kuryeler Grevi (Ratio)', quota: 22, rivals: ['kargo','kargo','queue'], rivalName: '2 Kurye + Kuyruk',
     intro: 'Kuryeler greve gitti: paketler sadece patlıyor. Kuyruk da grevi görmeye geldi.',
-    win: 'Grev bitti. Paketler hâlâ patlıyor, ama artık sigortalı.' },
-  { name: 'Poşet Fırtınası', quota: 22, rivals: ['teyze','teyze','zam','barista'], rivalName: '2 Teyze + Zam + Barista',
+    win: 'Grev bitti. Paketler hâlâ patlıyor, ama artık "ratio" yemiş sigortalı.' },
+  { name: 'Poşet Fırtınası: Cope', quota: 22, rivals: ['teyze','teyze','zam','barista'], rivalName: '2 Teyze + Zam + Barista',
     intro: 'Poşetler uçuşuyor, latteler yapışıyor, zam etiketleri yağıyor. Hava durumu: karışık.',
-    win: 'Fırtına dindi. Poşetler hâlâ yerde, geri dönüşüm bekleniyor.' },
-  { name: 'Sosyal Medya Fonu', quota: 22, rivals: ['fund','fund','dolmus','cat'], rivalName: '2 Vurgun + Dolmuş + Kedi',
+    win: 'Fırtına dindi. Poşetler yerde, kurt cope ediyor, hava durumu: delulu.' },
+  { name: 'Sosyal Medya Fonu: Delulu', quota: 22, rivals: ['fund','fund','dolmus','cat'], rivalName: '2 Vurgun + Dolmuş + Kedi',
     intro: 'İki fon yöneticisi para yağdırıyor, kedi "içerik" diye matcha çalıyor, dolmuş reklam arası veriyor.',
-    win: 'Fonlar "sürdürülebilir büyüme" dedi ve gece yarısı kayboldu.' },
-  { name: 'Hız Sınırı Yok', quota: 24, rivals: ['dolmus','dolmus','kargo','teyze'], rivalName: '2 Dolmuş + Kurye + Teyze',
+    win: 'Fonlar "sürdürülebilir büyüme" dedi ve gece yarısı kayboldu. İçerik: sildi, backup: yok.' },
+  { name: 'Hız Sınırı Yok (Gas Gas)', quota: 24, rivals: ['dolmus','dolmus','kargo','teyze'], rivalName: '2 Dolmuş + Kurye + Teyze',
     intro: 'Hız sınırı yok, şerit yok, mantık yok. Dolmuşlar, paketler ve poşetler aynı anda geliyor.',
-    win: 'Hız sınırı tabelası da şikâyet etti: "Bana da bakan olsun."' },
-  { name: 'Zincir Marketler', quota: 24, rivals: ['queue','teyze','kargo','zam'], rivalName: 'Kuyruk + Teyze + Kurye + Zam',
+    win: 'Hız sınırı tabelası şikayet etti: "Bana da bakan olsun." Gas gas gas.' },
+  { name: 'Zincir Market Skill Issue', quota: 24, rivals: ['queue','teyze','kargo','zam'], rivalName: 'Kuyruk + Teyze + Kurye + Zam',
     intro: 'Zincir markette kuyruk, poşet, paket ve zam etiketi birleşti. Raflar arasında kaç!',
-    win: 'Market kapandı. Tabela "yakında yeniden açılıyoruz" diyor, her zamanki gibi.' },
-  { name: 'Bayram Alışverişi', quota: 24, rivals: ['dolmus','kargo','cat','teyze','barista'], rivalName: 'Dolmuş + Kurye + Kedi + Teyze + Barista',
+    win: 'Market kapandı. Tabela: "yakında yeniden açılıyoruz". Skill issue: markette.' },
+  { name: 'Bayram: Mewing Zirvesi', quota: 24, rivals: ['dolmus','kargo','cat','teyze','barista'], rivalName: 'Dolmuş + Kurye + Kedi + Teyze + Barista',
     intro: 'Bayram alışverişi: yeni karakterlerin hepsi tek sokakta. Bu bölüm kalabalıktan bile kalabalık.',
-    win: 'Bayram bitti. Alışveriş sonsuza kadar sürecek.' },
-  { name: 'Neon Gökdelen', quota: 26, rivals: ['baron','dolmus','kargo','cat'], rivalName: 'Baron + Dolmuş + Kurye + Kedi',
+    win: 'Bayram bitti. Alışveriş sürüyor. Mewing yapan teyze çene hattını sakladı.' },
+  { name: 'Neon Gökdelen: Looksmaxxing', quota: 26, rivals: ['baron','dolmus','kargo','cat'], rivalName: 'Baron + Dolmuş + Kurye + Kedi',
     intro: 'Gökdelenin zirvesinde Baron\'un yeğeni oturuyor. Çevrede dolmuş, kurye ve kedi var. Yukarı doğru kaç!',
-    win: 'Gökdelenin asansörü bozuk. Ama sen zaten merdivenle çıktın.' },
-  { name: 'Dron Sürüsü', quota: 22, rivals: ['drone','drone','kargo','cat'], rivalName: '2 Dron + Kurye + Kedi',
+    win: 'Asansör bozuk, ama sen merdivenle çıktın. Looksmaxxing +3, çene hattı: 90 derece.' },
+  { name: 'Dron Sürüsü: Hâlâ Yolda', quota: 22, rivals: ['drone','drone','kargo','cat'], rivalName: '2 Dron + Kurye + Kedi',
     intro: 'Metropolün gökyüzü dronlarla dolu. Dron kırmızı çizgiyi çekince hemen yana kaç, çünkü bir saniye sonra o çizgide uçuyor!',
-    win: 'Dronların bataryası bitti. Kurye "kargo takipte" diye yazdı, kimse takip etmedi.' },
-  { name: 'İnşaat Alanı', quota: 22, rivals: ['crane','crane','dolmus','teyze'], rivalName: '2 Vinç Operatörü + Dolmuş + Teyze',
+    win: 'Dronların bataryası bitti. Kurye "yolda" yazdı. Üç gündür yolda. Hâlâ yolda.' },
+  { name: 'İnşaat: Pazartesi Sendromu', quota: 22, rivals: ['crane','crane','dolmus','teyze'], rivalName: '2 Vinç Amca (Pazartesi) + Dolmuş + Teyze',
     intro: 'İki vinç sıra sıra tuğla bırakıyor. Düşen tuğlaların hepsi aynı doğrultuda, sıra bitmeden yana çık!',
-    win: 'Vinçler "hafta sonu mesaisi" diyerek sustu. Tuğlalar hâlâ yerde.' },
-  { name: 'Kasa Robotları', quota: 24, rivals: ['robot','robot','fund','drone'], rivalName: '2 Kasa Robotu + Vurgun + Dron',
+    win: 'Vinçler "hafta sonu mesaisi" diyerek sustu. Tuğlalar yerde, pazartesi yine yerinde.' },
+  { name: 'Beklenmeyen Eşya Alarmı', quota: 24, rivals: ['robot','robot','fund','drone'], rivalName: '2 Beklenmeyen Eşya Robotu + Vurgun + Dron',
     intro: 'Robotlar halka dalgaları yayıyor, fon para yağdırıyor, dron çizgi çekiyor. Dalgaların arasından zıpla!',
-    win: 'Robotlar "ödeme alınamadı" diyerek kapandı. Hata kodu: 404 matcha.' },
-  { name: 'Fatura Günü', quota: 24, rivals: ['ghost','ghost','zam','cat','kargo'], rivalName: '2 Fatura Hayaleti + Zam + Kedi + Kurye',
+    win: 'Robot "beklenmeyen eşya" diyerek kapandı. Hata kodu: 404 matcha. Eşya: kurt.' },
+  { name: 'Doomscroll Fatura Günü', quota: 24, rivals: ['ghost','ghost','zam','cat','kargo'], rivalName: '2 Doomscroll Hayaleti + Zam + Kedi + Kurye',
     intro: 'Hayaletler soluklaşıp peşine düşüyor. Soluk olunca daha hızlılar, uzak dur! Zam etiketi de var.',
-    win: 'Hayaletler faturayı ödedi ve dinlendi. Kimse bu kısmı anlamadı.' },
-  { name: 'Gece Vardiyası', quota: 26, rivals: ['robot','ghost','drone','crane','dolmus'], rivalName: 'Robot + Hayalet + Dron + Vinç + Dolmuş',
+    win: 'Hayaletler faturayı ödedi ve uyudu. Telefon: %1. Doomscroll: hâlâ devam.' },
+  { name: 'Gece Vardiyası: Grindset', quota: 26, rivals: ['robot','ghost','drone','crane','dolmus'], rivalName: 'Robot + Hayalet + Dron + Vinç + Dolmuş',
     intro: 'Metropol gece vardiyasında: her yeni karakter bir arada. Dron çizgisi, vinç tuğlası, robot halkası, hayalet soluğu ve dolmuş şeridi!',
-    win: 'Vardiya bitti. Ama mesai kartı hâlâ basılı.' },
-  { name: 'Metropol Trafiği', quota: 26, rivals: ['dolmus','dolmus','drone','drone','kargo','teyze'], rivalName: '2 Dolmuş + 2 Dron + Kurye + Teyze',
+    win: 'Vardiya bitti. Mesai kartı hâlâ basılı. Grindset: bir sonraki vardiyaya kadar.' },
+  { name: 'Metropol: Rent Free', quota: 26, rivals: ['dolmus','dolmus','drone','drone','kargo','teyze'], rivalName: '2 Dolmuş + 2 Dron + Kurye + Teyze',
     intro: 'Yerde dolmuş şeritleri, havada dron çizgileri. İki boyutlu trafik: kaç, kaç, kaç!',
-    win: 'Trafik açıldı. Hepsi aynı anda. Kornalar hâlâ çalıyor.' },
-  { name: 'Yönetim Kurulu', quota: 28, rivals: ['baron','robot','ghost','crane','drone','fund'], rivalName: 'Baron + Robot + Hayalet + Vinç + Dron + Vurgun',
+    win: 'Trafik açıldı. Hepsi aynı anda. Kafamda hâlâ rent free: o korna.' },
+  { name: 'Yönetim Kurulu: Bro Is Cooked', quota: 28, rivals: ['baron','robot','ghost','crane','drone','fund'], rivalName: 'Baron + Robot + Hayalet + Vinç + Dron + Vurgun',
     intro: 'Yönetim kurulu toplantısı: baron tabelaları, robot halkaları, hayalet soluğu, vinç tuğlası, dron çizgisi ve para yağmuru. Toplantı uzun sürecek.',
-    win: 'Toplantı "bir sonrakine bırakıldı". İmparator tahtına dönüyor.' },
-  { name: 'Final: Nevada İmparatoru', quota: 30, rivals: ['baron', 'fund', 'ballerina', 'dolmus', 'kargo', 'cat', 'teyze', 'drone', 'crane', 'robot', 'ghost'], rivalName: 'İmparator ve Tüm Çete',
+    win: 'Toplantı "bir sonrakine bırakıldı". Herkes "bro is cooked" diyor, kimse kimin cooked olduğunu bilmiyor.' },
+  { name: 'SEZON 1 FİNALİ: Nevada İmparatoru', quota: 30, rivals: ['baron', 'fund', 'ballerina', 'dolmus', 'kargo', 'cat', 'teyze', 'drone', 'crane', 'robot', 'ghost'], rivalName: 'İmparator ve Tüm Çete',
     intro: 'Nevada İmparatoru tahtında: baron, fon, timsah, balerin, dolmuş, kurye, kedi ve teyze hep birlikte. Son bölüm. Bu sefer gerçek!',
-    win: 'İmparator tahtından düştü. Tabelalar bu kez gerçekten söndü.' }
+    win: 'İmparator tahtından düştü. Tabelalar söndü. Ama dağın ardında garip bir ekran parlıyor: 6-7.' },
+  { name: 'S2 Bölüm 1: Meme Sıfırlaması', quota: 28, rivals: ['rizz', 'fanum', 'mew'], rivalName: 'Rizzler + Fanum Kuryesi + Mewing Sahurcusu',
+    intro: 'Büyük Meme Sıfırlaması başladı! Eski şakalar silindi, yenileri yüklenirken sistem yarım yamalak. Rizzler ışınlanıyor, Fanum kuryesi vergi kesiyor.',
+    win: 'Sıfırlama yüzde 12\'de takıldı. Prenses: "Yüklenmeyi bekliyorum." Kurt: "Ben de."' },
+  { name: 'Skibidi Tuvalet Baskını', quota: 28, rivals: ['skib', 'skib', 'frog', 'fanum'], rivalName: '2 Skibidi Dron + Kurbağa + Fanum',
+    intro: 'Havada tuvaletler uçuyor, çizgi çekince tuvalet o çizgiden geçiyor. Kurbağa matcha çalıyor. Neden? Sormayın.',
+    win: 'Tuvaletler sifonu çekti. Kimse açıklama yapmadı, kimse açıklama istemedi.' },
+  { name: 'Ohio İnşaatı (Yine)', quota: 30, rivals: ['ohio', 'ohio', 'fanum', 'rizz'], rivalName: '2 Ohio Vinci + Fanum + Rizzler',
+    intro: 'Ohio\'da vinç tuğla yağdırıyor. Mısır tarlası inşaat alanı olmuş. Sıra bitmeden yana kaç!',
+    win: 'Mısırlar tuğlaya dönüştü. Ohio\'da bu bir Salı.' },
+  { name: 'Doomscroll Gecesi', quota: 30, rivals: ['doom', 'doom', 'skib', 'frog'], rivalName: '2 Doomscroll Zombisi + Skibidi + Kurbağa',
+    intro: 'Saat 03:14. Zombiler soluk ve hızlı, ekran parlaklığı yüzde 100. "Bir tane daha" diyerek bir saat geçirdin.',
+    win: 'Telefon %1\'de şarj oldu. Zombiler uyuyakaldı. Sabah 6\'da alarm: pişmanlık.' },
+  { name: 'Moai Gigachad Tapınağı', quota: 30, rivals: ['moai', 'moai', 'rizz', 'ohio'], rivalName: '2 Moai Gigachad + Rizzler + Ohio',
+    intro: 'Moai heykelleri halka dalgası yayıyor. Gigachad bakışı seni cezalandırıyor. Çene hattı 90 derece, dalgalar 180.',
+    win: 'Heykeller çatladı. İçinden: "Mmm." Başka bir şey çıkmadı.' },
+  { name: 'Mewing Dojosu', quota: 32, rivals: ['mew', 'mew', 'fanum', 'doom', 'rug'], rivalName: '2 Mewing + Fanum + Doomscroll + Rug Pull',
+    intro: 'Mewing Sahurcuları sessizce şok dalgası yayıyor. Çene hizalı, kimse konuşmuyor, herkes bakıyor.',
+    win: 'Dojo sessizce kapandı. Kimse bir şey demedi. Mewing çalıştı.' },
+  { name: 'Rug Pull Borsası', quota: 32, rivals: ['rug', 'rug', 'six', 'frog', 'skib'], rivalName: '2 Rug Pull + 6-7 Canavarı + Kurbağa + Skibidi',
+    intro: 'Borsa yeşil! Ardından kırmızı. Ardından matcha yok. Coin\'ler yağıyor, etiketler seni kovalıyor.',
+    win: 'Borsa kapandı. "Finansal tavsiye değil" yazısı hâlâ ekranda. Aura: kayıp.' },
+  { name: '6-7 Canavarı', quota: 34, rivals: ['six', 'moai', 'doom', 'ohio', 'rizz', 'mew'], rivalName: '6-7 Canavarı + Moai + Doomscroll + Ohio + Rizzler + Mewing',
+    intro: 'Altı mı yedi mi? Kimse bilmiyor. Canavar etiketleri yağdırıyor, Moai dalga yapıyor, her şey aynı anda.',
+    win: '6-7 dedi, ortadan kayboldu. Sayı: ne 6 ne 7. Sadece vibe.' },
+  { name: 'Aura Farm Cehennemi', quota: 34, rivals: ['six', 'rug', 'moai', 'doom', 'skib', 'ohio', 'fanum'], rivalName: '7 çete üyesi',
+    intro: 'Aura puanı eksiye düştü. Cehennem: kasaba, mağaza, tuvalet ve mısır tarlası birleşti. Farm modunda hayatta kal.',
+    win: 'Aura +9999 oldu. Sistem hata verdi: "Bu kadar aura desteklenmiyor."' },
+  { name: 'FİNAL: Brainrot İmparatoru', quota: 36, rivals: ['brain', 'six', 'rug', 'moai', 'doom', 'skib', 'ohio', 'rizz', 'mew', 'fanum', 'frog'], rivalName: 'Brainrot İmparatoru ve Meme Ordusu',
+    intro: 'Brainrot İmparatoru ekran ışığıyla tahtında. Tüm meme ordusu burada. Bu sefer gerçekten, ciddi ciddi, sezon finali.',
+    win: 'Brainrot İmparatoru tahtından düştü. Ekranlar karardı. Dünya bir an sessiz kaldı, sonra yeni bir meme çıktı.' }
 ];
 
-function Q() { const q = LEVELS[L].quota; return Math.round(q * (1 + .22 * (Math.max(1, players.length) - 1))); }
-const CHAPTERS = [{ from: 0, name: 'Gabar Dağları' }, { from: 7, name: 'Nevada Çölü' }, { from: 21, name: 'Nevada Metropolü' }];
+function Q() { const q = LEVELS[L].quota; return Math.round(q * 1.15 * (1 + .28 * (Math.max(1, players.length) - 1))); }
+const DIFF = 1.3;
+const CHAPTERS = [{ from: 0, name: 'Gabar Dağları' }, { from: 7, name: 'Nevada Çölü' }, { from: 21, name: 'Nevada Metropolü' }, { from: 34, name: 'SEZON 2: Büyük Meme Sıfırlaması' }];
 function chapterOf(i) { let c = 0; CHAPTERS.forEach((ch, k) => { if (i >= ch.from) c = k; }); return c; }
 
 /* ---------- durum ---------- */
-let scene = 'menu', btns = [], t0 = 0, time = 0;
+let scene = 'splash', splashT = 0, introT = 0, btns = [], t0 = 0, time = 0;
 let progress = 0, L = 0;
 try { progress = +(localStorage.getItem('matchaProg') || 0) || 0; } catch (e) { }
 function saveProg() { try { localStorage.setItem('matchaProg', progress); } catch (e) { } }
@@ -240,9 +273,19 @@ const THEMES = [
   { sky: ['#101a40', '#3a5a9a'], mt: ['#2c3a6a', '#1f2a50', '#151d3a'], gr: ['#343a4a', '#1e222c'], snow: 0, stars: 1, kind: 'city', neon: '#6aa8ff' },
   { sky: ['#2a1040', '#8a3a7a'], mt: ['#43285f', '#321d49', '#231435'], gr: ['#3a3446', '#221e2a'], snow: 0, stars: 1, kind: 'city', neon: '#ffd84a' },
   { sky: ['#0a2a3a', '#2a8a9a'], mt: ['#1f4a5a', '#16384a', '#0e2736'], gr: ['#33424a', '#1c262c'], snow: 0, stars: 1, kind: 'city', neon: '#4dffd0' },
-  { sky: ['#12020a', '#8a0f2a'], mt: ['#3a0f1a', '#2a0a12', '#1a060a'], gr: ['#3a2a30', '#201418'], snow: 0, stars: 1, kind: 'city', neon: '#ffd84a' }
+  { sky: ['#12020a', '#8a0f2a'], mt: ['#3a0f1a', '#2a0a12', '#1a060a'], gr: ['#3a2a30', '#201418'], snow: 0, stars: 1, kind: 'city', neon: '#ffd84a' },
+  { sky: ['#0a0030', '#ff3df0'], mt: ['#2a1a4a', '#1f1236', '#140a24'], gr: ['#2d2a3a', '#17151f'], snow: 0, stars: 1, kind: 'neon', neon: '#3aff8a' },
+  { sky: ['#001a30', '#3dd9ff'], mt: ['#2a1a4a', '#1f1236', '#140a24'], gr: ['#2d2a3a', '#17151f'], snow: 0, stars: 1, kind: 'neon', neon: '#ff3d6a' },
+  { sky: ['#2a1a00', '#3dff8a'], mt: ['#2a1a4a', '#1f1236', '#140a24'], gr: ['#2d2a3a', '#17151f'], snow: 0, stars: 1, kind: 'neon', neon: '#ffe83d' },
+  { sky: ['#10001f', '#ff7ad0'], mt: ['#2a1a4a', '#1f1236', '#140a24'], gr: ['#2d2a3a', '#17151f'], snow: 0, stars: 1, kind: 'neon', neon: '#a23dff' },
+  { sky: ['#1a1a1a', '#ff4f4f'], mt: ['#2a1a4a', '#1f1236', '#140a24'], gr: ['#2d2a3a', '#17151f'], snow: 0, stars: 1, kind: 'neon', neon: '#d8d8d8' },
+  { sky: ['#002b2b', '#ffd83d'], mt: ['#2a1a4a', '#1f1236', '#140a24'], gr: ['#2d2a3a', '#17151f'], snow: 0, stars: 1, kind: 'neon', neon: '#3dffe0' },
+  { sky: ['#2b0010', '#3dff6a'], mt: ['#2a1a4a', '#1f1236', '#140a24'], gr: ['#2d2a3a', '#17151f'], snow: 0, stars: 1, kind: 'neon', neon: '#ff3d3d' },
+  { sky: ['#00102b', '#ff3dd4'], mt: ['#2a1a4a', '#1f1236', '#140a24'], gr: ['#2d2a3a', '#17151f'], snow: 0, stars: 1, kind: 'neon', neon: '#3d8aff' },
+  { sky: ['#220033', '#3dfff0'], mt: ['#2a1a4a', '#1f1236', '#140a24'], gr: ['#2d2a3a', '#17151f'], snow: 0, stars: 1, kind: 'neon', neon: '#ff9b3d' },
+  { sky: ['#000000', '#00ffcc'], mt: ['#2a1a4a', '#1f1236', '#140a24'], gr: ['#2d2a3a', '#17151f'], snow: 0, stars: 1, kind: 'neon', neon: '#ff00aa' }
 ];
-const CAFES = [1, 2, 3, 4, 6, 8, 11, 14, 17, 20, 24, 28, 22, 24, 22, 20, 26, 24, 22, 20, 18, 24, 26, 28, 26, 30, 30, 32, 32, 34, 34, 36, 38, 44];
+const CAFES = [1, 2, 3, 4, 6, 8, 11, 14, 17, 20, 24, 28, 22, 24, 22, 20, 26, 24, 22, 20, 18, 24, 26, 28, 26, 30, 30, 32, 32, 34, 34, 36, 38, 44, 46, 48, 50, 52, 54, 56, 58, 62, 66, 69];
 function cafe(g, x, y, sc, neon, tag) {
   g.save(); g.translate(x, y); g.scale(sc, sc);
   if (neon) { g.shadowColor = neon; g.shadowBlur = 9; }
@@ -320,6 +363,11 @@ const bgs = new Map();
 function getBG(i) { let c = bgs.get(i); if (!c) { c = makeBG(i); bgs.set(i, c); if (bgs.size > 3) { const k0 = bgs.keys().next().value; bgs.delete(k0); } } else { bgs.delete(i); bgs.set(i, c); } return c; }
 
 /* ---------- bölüm başlat ---------- */
+const RESKIN = {
+  rizz: ['ballerina', '😏', 'Rizzler Balerin'], doom: ['ghost', '📱', 'Doomscroll Zombisi'], moai: ['robot', '🗿', 'Moai Gigachad'], skib: ['drone', '🚽', 'Skibidi Dron'],
+  frog: ['cat', '🐸', 'Kurbağa Hırsızı'], mew: ['drummer', '🤫', 'Mewing Sahurcusu'], fanum: ['kargo', '🍟', 'Fanum Vergisi Kuryesi'], ohio: ['crane', '🌽', 'Ohio Vinci'],
+  rug: ['fund', '📉', 'Rug Pull Abi'], six: ['zam', '6️⃣', '6-7 Canavarı'], brain: ['baron', '🧠', 'Brainrot İmparatoru']
+};
 function startLevel(i) {
   L = i; const lv = LEVELS[i];
   const online = !!net.role, isG = net.role === 'guest';
@@ -327,7 +375,7 @@ function startLevel(i) {
   const roster = online ? net.roster : [{ n: myNick, k: skinW }], meIdx = isG ? net.me : 0;
   players = roster.map((r, k) => { const P = mkWolf(110 + k * 55, WH - 90 - k * 36, r.k, k === meIdx); P.nick = r.n; P.hp = 3; P.down = false; P.rv = 0; return P; });
   wolf = players[meIdx] || players[0]; maxLives = 3;
-  lives = maxLives; got = 0; inv = 0; shake = 0; dashCd = 0; matchas = []; rocks = []; rivals = []; hazards = []; parts = []; popups = []; princess = null; paused = false;
+  introT = 1.0; lives = maxLives; got = 0; inv = 0; shake = 0; dashCd = 0; matchas = []; rocks = []; rivals = []; hazards = []; parts = []; popups = []; princess = null; paused = false;
   if (i === 0 || !score) score = 0;
   bgCache = getBG(i); updateCam(true);
   const R = mulberry(500 + i * 31);
@@ -337,10 +385,11 @@ function startLevel(i) {
       if (dist(r, wolf) > 130 && rocks.every(o => dist(o, r) > o.r + r.r + 50)) { rocks.push(r); break; }
     }
   }
-  const total = Math.round(Q() * 1.6) + 4;
-  for (let k = 0; k < total; k++) spawnMatcha(k % 6 === 5);
-  lv.rivals.forEach((t, idx) => {
-    const e = { type: t, x: WW * rand(.5, .95), y: rand(FIELD_TOP + 60, WH - 120), t: rand(0, 2), st: 0, vx: 0, vy: 0, tx: 0, ty: 0, minions: 0, tele: null };
+  const total = Q() + 1;
+  for (let k = 0; k < total; k++) spawnMatcha(k % 9 === 8);
+  lv.rivals.forEach((t0, idx) => {
+    const t = RESKIN[t0] ? RESKIN[t0][0] : t0;
+    const e = { sk: RESKIN[t0] ? t0 : null, type: t, x: WW * rand(.5, .95), y: rand(FIELD_TOP + 60, WH - 120), t: rand(0, 2), st: 0, vx: 0, vy: 0, tx: 0, ty: 0, minions: 0, tele: null };
     if (t === 'queue') { e.hx = -30; e.hy = rand(FIELD_TOP + 80, FIELD_BOT - 80); e.base = e.hy; e.dir = 1; e.hist = []; for (let k = 0; k < 260; k++) e.hist.push({ x: e.hx, y: e.hy }); e.x = e.hx; e.y = e.hy; }
     if (t === 'barista') { e.tx = e.x; e.ty = e.y; }
     if (t === 'croc') { e.y = 92; e.vx = 110 + i * 6; e.x = rand(200, WW - 200); }
@@ -356,7 +405,8 @@ function startLevel(i) {
 function spawnMatcha(gold) {
   for (let tries = 0; tries < 60; tries++) {
     const m = { x: 50 + Math.random() * (WW - 100), y: FIELD_TOP + 30 + Math.random() * (FIELD_BOT - FIELD_TOP - 60), gold: !!gold, ph: Math.random() * 6, r: 15 };
-    if (rocks.every(o => dist(o, m) > o.r + 28) && matchas.every(o => dist(o, m) > 50) && dist(m, wolf) > 90) { matchas.push(m); return; }
+    m.life = rand(20, 30);
+    if (rocks.every(o => dist(o, m) > o.r + 28) && matchas.every(o => dist(o, m) > 90) && players.every(P => !P.on || dist(m, P) > (net.role ? 260 : 160))) { matchas.push(m); return; }
   }
 }
 
@@ -367,7 +417,7 @@ function allDown() { const on = players.filter(P => P.on); return on.length > 0 
 function checkAllDown() { if (scene === 'play' && net.role && allDown()) { overMsg = pick(MEME_OVER); scene = 'over'; sfx.lose(); setBtns(); } }
 function hurt(w) {
   w = w || wolf; if (w.inv > 0 || scene !== 'play' || w.down || !w.on) return;
-  w.inv = 1.7; shake = .5;
+  w.inv = 1.1; shake = .5;
   if (w === wolf) punch = { t: 0 }; else if (net.role === 'host') net.evq.push(['pu', players.indexOf(w)]);
   sfx.hurt(); burst(w.x, w.y, '#c9ced6', 22); popup(pick(MEME_HURT), w.x, w.y - 30, '#e6e9ee');
   if (net.role) {
@@ -377,9 +427,9 @@ function hurt(w) {
   lives--;
   if (lives <= 0) { overMsg = pick(MEME_OVER); scene = 'over'; sfx.lose(); setBtns(); }
 }
-const MEME_PICK = ['+1', 'aura +100', 'W', 'sigma', 'ez', 'based', 'gg', 'mood', 'çok iyi'], MEME_GOLD = ['GIGACHAD +2', 'jackpot', 'bro cooked'],
-  MEME_HURT = ['skill issue', 'L', 'ratio', 'mid', 'cope', 'ayy!', 'bonk', 'yazık'], MEME_DRINK = ['SLURP', 'enerji geldi', 'sigma grindset', 'matcha arc', 'aura farm'],
-  MEME_OVER = ['Skill issue.', 'Bro got cooked', 'L + ratio + dolap', 'Kurt yakalandı!'], MEME_WIN = ['GG EZ', 'W Prenses', 'Prenses Kurtarıldı!', 'Çok yaşa W'];
+const MEME_PICK = ['+1', 'aura +100', 'W', 'sigma', 'ez', 'based', 'gg', 'mood', 'rizz +1', 'mewing', 'fanum tax ödendi', '6-7', 'delulu ama haklı', 'it is giving matcha'], MEME_GOLD = ['GIGACHAD +2', 'jackpot', 'bro cooked (iyi anlamda)', 'AURA +9999'],
+  MEME_HURT = ['skill issue', 'L', 'ratio', 'mid', 'cope', 'ayy!', 'bonk', 'touch grass', 'NPC moment', 'bro is cooked', 'chat is this real'], MEME_DRINK = ['SLURP', 'enerji geldi', 'sigma grindset', 'matcha arc', 'aura farm', 'gas gas gas', 'looksmaxxing'],
+  MEME_OVER = ['Skill issue.', 'Bro got cooked', 'L + ratio + dolap', 'Kurt yakalandı!', 'Only in Ohio', 'Chat, kurt gitti', 'Cope + seethe + matcha yok', 'Ben de yenildim kanka'], MEME_WIN = ['GG EZ', 'W Prenses', 'Prenses Kurtarıldı!', 'Çok yaşa W', 'AURA +9999', 'Sigma Prenses'];
 const pick = a => a[Math.floor(Math.random() * a.length)];
 let overMsg = '', winMsg = '';
 function drink(w) {
@@ -410,13 +460,14 @@ function stepWolf(wolf, vx, vy, dt) {
   wolf.x = clamp(wolf.x, 24, WW - 24); wolf.y = clamp(wolf.y, FIELD_TOP, FIELD_BOT);
   for (const o of rocks) { const d = dist(wolf, o), m = o.r + wolf.r - 4; if (d < m && d > 0) { wolf.x = o.x + (wolf.x - o.x) / d * m; wolf.y = o.y + (wolf.y - o.y) / d * m; } }
   { const sk0 = WOLF_SKINS[wolf.skin]; if (!LITE && sk0.trail && (vx || vy) && Math.random() < dt * 28) parts.push({ x: wolf.x - vx * 10 + rand(-5, 5), y: wolf.y + 8 + rand(-3, 3), vx: rand(-12, 12), vy: rand(-26, -6), life: .55, max: .55, col: sk0.trail, ch: sk0.te, r: sk0.te ? rand(2.4, 3.4) : rand(1.5, 3.2) }); }
-  if (wolf.energyT > 0) { wolf.energyT = Math.max(0, wolf.energyT - dt / 6.5); if (wolf.energyT > .12) wolf.trail.push({ x: wolf.x, y: wolf.y, l: .3 }); }
+  if (wolf.energyT > 0) { wolf.energyT = Math.max(0, wolf.energyT - dt / 4.8); if (wolf.energyT > .12) wolf.trail.push({ x: wolf.x, y: wolf.y, l: .3 }); }
   if (wolf.drinkT > 0) wolf.drinkT -= dt;
   wolf.trail.forEach(p => p.l -= dt); wolf.trail = wolf.trail.filter(p => p.l > 0);
   if (wolf.inv > 0) wolf.inv -= dt;
 }
 function update(dt) {
   time += dt; if (paused) return;
+  if (introT > 0) { introT -= dt; return; }
   const lv = LEVELS[L];
   for (const P of players) { if (!P.on) continue; if (P.down) { P.moving = false; if (P.inv > 0) P.inv -= dt; continue; } if (P.local) { const [vx, vy] = inputVec(); stepWolf(P, vx, vy, dt); } else stepWolf(P, P.in.vx, P.in.vy, dt); }
   if (net.role) for (const D of players) {
@@ -429,7 +480,7 @@ function update(dt) {
   for (const wolf of players) {
     if (!wolf.on || wolf.down) continue;
   for (let i = matchas.length - 1; i >= 0; i--) {
-      const m = matchas[i]; if (dist(m, wolf) < m.r + wolf.r + 4 + 46 * Math.max(0, wolf.energyT)) {
+      const m = matchas[i]; if (dist(m, wolf) < m.r + wolf.r + 4 + 32 * Math.max(0, wolf.energyT)) {
         wolf.stock = Math.min(3, wolf.stock + 1);
         matchas.splice(i, 1); const add = m.gold ? 2 : 1; got += add; score += m.gold ? 300 : 100;
         burst(m.x, m.y, m.gold ? '#ffd84a' : '#9be36b', m.gold ? 26 : 14); popup(m.gold ? pick(MEME_GOLD) : pick(MEME_PICK), m.x, m.y - 20, m.gold ? '#ffd84a' : '#d8ffc0');
@@ -442,11 +493,12 @@ function update(dt) {
       }
     }
   }
-  if (!princess && matchas.length < Math.max(4, Q() - got + 3)) spawnMatcha(Math.random() < .15);
+  for (let i = matchas.length - 1; i >= 0; i--) { const m = matchas[i]; if (m.life !== undefined) { m.life -= dt; if (m.life <= 0) { matchas.splice(i, 1); burst(m.x, m.y, '#8a8a8a', 8); } } }
+  if (!princess && matchas.length < Math.max(3, Math.min(Q() - got + 1, 9))) spawnMatcha(Math.random() < .1);
   if (princess) { princess.t += dt; if (players.some(P => P.on && !P.down && dist(princess, P) < 40)) { score += (net.role ? players.reduce((a, P) => a + (P.on ? Math.max(0, P.hp) : 0), 0) : lives) * 200; winMsg = pick(MEME_WIN); scene = 'cleared'; sfx.win(); burst(princess.x, princess.y, '#ffd84a', 60); if (L + 1 > progress) { progress = Math.min(L + 1, LEVELS.length - 1); saveProg(); } setBtns(); } }
 
   // rakipler
-  const lvf = 1 + Math.min(L, 11) * .06 + Math.max(0, L - 11) * .012 + Math.max(0, L - 20) * .02;
+  const lvf = Math.min(2.3, DIFF * (1 + Math.min(L, 11) * .06 + Math.max(0, L - 11) * .012 + Math.max(0, L - 20) * .02) * (1 + .12 * (Math.max(1, players.length) - 1)));
   for (const e of rivals) {
     e.t += dt; const wolf = nearest(e);
     if (e.type === 'drummer') {
@@ -502,7 +554,7 @@ function update(dt) {
       if (dist(e, wolf) < 34) hurt(wolf);
     } else if (e.type === 'drone') {
       if (e.st === 0) { const a = Math.atan2(wolf.y - e.y + rand(-60, 60) * 0, wolf.x - e.x); e.x += Math.cos(a) * 85 * lvf * dt; e.y += Math.sin(a) * 85 * lvf * dt; if (e.t > 2.5 / lvf) { e.st = 1; e.t = 0; const aa = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.vx = Math.cos(aa) * 700; e.vy = Math.sin(aa) * 700; sfx.warn(); } }
-      else if (e.st === 1) { if (e.t > .95 / Math.sqrt(lvf)) { e.st = 2; e.t = 0; sfx.dash(); } }
+      else if (e.st === 1) { if (e.t > .8 / Math.sqrt(lvf)) { e.st = 2; e.t = 0; sfx.dash(); } }
       else if (e.st === 2) { e.x += e.vx * dt; e.y += e.vy * dt; for (const P of players) if (P.on && !P.down && dist(e, P) < 36) hurt(P); if (e.t > .5 || e.x < 20 || e.x > WW - 20 || e.y < FIELD_TOP - 40 || e.y > WH - 10) { e.x = clamp(e.x, 20, WW - 20); e.y = clamp(e.y, FIELD_TOP - 40, WH - 10); e.st = 3; e.t = 0; } }
       else { if (e.t > .9) { e.st = 0; e.t = 0; } }
       if (e.st !== 2 && dist(e, wolf) < 30) hurt(wolf);
@@ -517,7 +569,7 @@ function update(dt) {
       if (dist(e, wolf) < 34) hurt(wolf);
     } else if (e.type === 'ghost') {
       if (e.st === 0) { const a = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.x += Math.cos(a) * 48 * dt; e.y += Math.sin(a) * 48 * dt; if (e.t > 4.2 / lvf) { e.st = 1; e.t = 0; sfx.warn(); } }
-      else { const a = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.x += Math.cos(a) * 128 * lvf * dt; e.y += Math.sin(a) * 128 * lvf * dt; if (e.t > 2.8) { e.st = 0; e.t = 0; } }
+      else { const a = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.x += Math.cos(a) * 128 * Math.min(lvf, 1.7) * dt; e.y += Math.sin(a) * 128 * Math.min(lvf, 1.7) * dt; if (e.t > 2.8) { e.st = 0; e.t = 0; } }
       e.y = clamp(e.y, FIELD_TOP - 20, FIELD_BOT + 10); if (dist(e, wolf) < 32) hurt(wolf);
     } else if (e.type === 'zam' || e.type === 'baron') {
       e.x = clamp(wolf.x + Math.sin(time * .6) * 320, 60, WW - 60); e.y += (clamp(wolf.y - 260, 90, WH - 60) - e.y) * Math.min(1, dt * 2) + Math.sin(time * 1.3) * .25;
@@ -577,6 +629,18 @@ const WOLF_SKINS = [
   { name: 'Dönerci', tag: 'Acılı mı olsun?', f: 'sepia(.5) saturate(1.6)', aura: 'rgba(255,150,40,.6)', trail: '#ffa040', te: '🔥', acc: [['🥙', 0, -27, 26]] },
   { name: 'Çaycı', tag: 'Demli, tavşan kanı', f: 'sepia(.7) saturate(1.8) hue-rotate(-10deg)', aura: 'rgba(200,120,60,.6)', trail: '#c8783c', te: '☕', acc: [['🫖', 24, 12, 24]] },
   { name: 'Meme Lordu', tag: 'Bro is cooked', f: 'grayscale(1) contrast(1.6)', aura: 'rgba(255,255,255,.4)', trail: '#e8e8e8', te: '💀', acc: [['💀', 0, -27, 24]] },
+  { name: 'Skibidi Kurt', tag: 'Tuvaletten çıktı', f: 'sepia(.6) saturate(2.5) hue-rotate(160deg)', aura: 'rgba(120,200,255,.6)', trail: '#9fd8ff', te: '🚽', acc: [['🚽', 0, -27, 24]] },
+  { name: 'Rizzler', tag: 'Rizz +100', f: 'sepia(.5) saturate(2)', aura: 'rgba(255,120,190,.7)', trail: '#ff8ac6', te: '💘', acc: [['😏', 0, -27, 24], ['🕶️', 0, -3, 28]] },
+  { name: 'Mewing Kurt', tag: 'Çene hattı: konuşmuyor', f: 'grayscale(.7) contrast(1.3)', aura: 'rgba(230,230,255,.5)', trail: '#e0e0ff', te: '🤫', acc: [['🤫', 0, -27, 22]] },
+  { name: 'Ohio Kurdu', tag: 'Only in Ohio', f: 'sepia(1) saturate(2.5) hue-rotate(20deg) brightness(1.1)', aura: 'rgba(255,220,60,.6)', trail: '#ffe14d', te: '🌽', acc: [['🌽', 22, 12, 24]] },
+  { name: 'Aura 9999', tag: 'Sistem desteklemiyor', f: 'sepia(1) saturate(4) brightness(1.4)', aura: 'rgba(255,255,160,.9)', trail: '#fffbb0', te: '✨', acc: [['✨', 0, -30, 26], ['👑', 0, -27, 24]] },
+  { name: 'Doomscroll', tag: 'Bir tane daha', f: 'brightness(.6) contrast(1.2) hue-rotate(200deg)', aura: 'rgba(100,140,255,.55)', trail: '#8aa8ff', te: '📱', acc: [['📱', 24, 12, 24]] },
+  { name: 'Fanum Vergisi', tag: 'Patatesin yarısı benim', f: 'sepia(.8) saturate(2.5) hue-rotate(-5deg)', aura: 'rgba(255,200,60,.6)', trail: '#ffc83c', te: '🍟', acc: [['🍟', 24, 12, 24]] },
+  { name: 'NPC', tag: 'Sol tık: diyalog', f: 'grayscale(1) brightness(1.1)', aura: null, trail: '#c0c0c0', te: '💬', acc: [['💬', 18, -26, 22]] },
+  { name: 'Delulu', tag: 'Solulu değil', f: 'sepia(.6) saturate(3) hue-rotate(260deg) brightness(1.15)', aura: 'rgba(255,150,230,.7)', trail: '#ff9ee8', te: '🦄', acc: [['🦄', 0, -28, 24]] },
+  { name: '6-7 Kurt', tag: 'Altı mı yedi mi?', f: 'none', aura: 'rgba(255,255,255,.4)', trail: '#ffffff', te: '6️⃣', acc: [['6️⃣', -13, -27, 18], ['7️⃣', 13, -27, 18]] },
+  { name: 'Emekçi Kedi', tag: 'Sendikalı', f: 'sepia(.9) saturate(2) brightness(1.05)', aura: 'rgba(255,170,90,.55)', trail: '#ffaa5a', te: '🐈', acc: [['🐈', 0, -27, 24]] },
+  { name: 'Tung Tak Kurt', tag: 'Sahura 3 dakika', f: 'sepia(.6) saturate(1.8)', aura: 'rgba(255,170,90,.5)', trail: '#ffb36b', te: '🥁', acc: [['🥁', 24, 12, 24]] },
   { name: 'Matcha Kurdu', tag: 'Matchanın çocuğu', f: 'sepia(1) saturate(4) hue-rotate(40deg) brightness(1.05)', aura: 'rgba(130,230,90,.75)', trail: '#9be36b', te: '🍃', acc: [['🍵', 0, -27, 24]] }
 ];
 const PRINCESS_SKINS = [
@@ -590,6 +654,12 @@ const PRINCESS_SKINS = [
   { name: 'Kanka Prenses', tag: 'Naber kanka', dress: ['#2f6fed', '#162a66'], crown: '#ffffff', beads: ['#fff', '#6fe3ff', '#ffd84a'], aura: 'rgba(90,150,255,.6)', acc: [['🧢', 0, -31, 26]] },
   { name: 'Brainrot Prenses', tag: 'Skibidi tahtı', dress: ['#ff3df0', '#3d9cff'], crown: '#6dfff0', beads: ['#ff4fd8', '#4dffd0', '#ffe94d'], aura: 'rgba(255,70,240,.65)', acc: [['🧠', 0, -38, 22]] },
   { name: 'Çaycı Teyze', tag: 'Çay demledim, gel', dress: ['#7ab55c', '#2f5a2a'], crown: '#f4e6b0', beads: ['#ff9ec7', '#f4e6b0', '#ffd84a'], aura: 'rgba(160,220,110,.55)', acc: [['🫖', 30, 22, 22], ['🌸', -13, -32, 16]] },
+  { name: 'Skibidi Prenses', tag: 'Tuvalet tahtı', dress: ['#7fd0ff', '#235a8a'], crown: '#e8f6ff', beads: ['#7fd0ff', '#fff', '#ffd84a'], aura: 'rgba(120,200,255,.6)', acc: [['🚽', 30, 22, 22]] },
+  { name: 'Rizz Kraliçesi', tag: 'Rizz gerçek', dress: ['#ff4f9a', '#7a1244'], crown: '#ffd1e6', beads: ['#ff8ac6', '#fff', '#ffd84a'], aura: 'rgba(255,100,170,.65)', acc: [['😏', 0, -38, 22]] },
+  { name: 'Delulu Prenses', tag: 'Solulu değil', dress: ['#b46bff', '#4a1d8a'], crown: '#ffe6ff', beads: ['#ff9ee8', '#fff', '#8fe3ff'], aura: 'rgba(190,120,255,.65)', acc: [['🦄', 0, -38, 22]] },
+  { name: 'Aura Prenses', tag: 'Aura 9999', dress: ['#fff3a0', '#c99a1c'], crown: '#fffbd0', beads: ['#fffbd0', '#ffd84a', '#fff'], aura: 'rgba(255,255,160,.85)', acc: [['✨', 0, -40, 22]] },
+  { name: 'NPC Prenses', tag: 'Sol tık: diyalog', dress: ['#9a9a9a', '#444'], crown: '#cfcfcf', beads: ['#ccc', '#fff', '#888'], aura: null, acc: [['💬', 28, -24, 20]] },
+  { name: 'Ohio Kraliçesi', tag: 'Only in Ohio', dress: ['#e6c63a', '#5a7a1a'], crown: '#fff3b0', beads: ['#ffe14d', '#7ac143', '#fff'], aura: 'rgba(255,220,60,.55)', acc: [['🌽', 30, 22, 22]] },
   { name: 'Dönerci Prenses', tag: 'Dürüm mü, porsiyon mu?', dress: ['#d9792b', '#7a3a10'], crown: '#ffd36b', beads: ['#ff5a3c', '#ffd84a', '#fff'], aura: 'rgba(255,160,60,.6)', acc: [['🥙', 30, 22, 22], ['🔥', -28, 26, 18]] }
 ];
 let skinW = 0, skinP = 0, skinTab = 0, skinPage = 0;
@@ -681,8 +751,8 @@ function drawDolmus(e) {
 function drawRival(e) {
   if (e.type === 'queue') { drawQueue(e); return; }
   if (e.type === 'dolmus') { drawDolmus(e); return; }
-  const map = { drummer: ['🥁', 'Tak Tak Sahurcu'], fund: ['💸', 'Kraliçe Vurgun'], croc: ['🐊', 'Bombardıman'], ballerina: ['🩰', 'Kapuçino Balerin'], zam: ['🏷️', 'Zam Canavarı'], barista: ['☕', 'Stajyer Barista'], baron: ['🕴️', 'Franchise Baronu'], kargo: ['🚚', 'Kargo Kuryesi'], cat: ['🐈', 'Hırsız Kedi'], teyze: ['👵', 'Poşet Teyze'], drone: ['🚁', 'Dron Kurye'], crane: ['🏗️', 'Vinç Operatörü'], robot: ['🤖', 'Kasa Robotu'], ghost: ['👻', 'Fatura Hayaleti'] };
-  const [ch, name] = map[e.type];
+  const map = { drummer: ['🥁', 'Tung Tak Sahurcu'], fund: ['💸', 'Kripto Abla'], croc: ['🐊', 'Bombardiro'], ballerina: ['🩰', 'Kapuçino Balerin'], zam: ['🏷️', 'Enflasyon Goblini'], barista: ['☕', 'Maaşsız Barista'], baron: ['🕴️', 'LinkedIn Baronu'], kargo: ['🚚', 'Hep "Dağıtımda" Kurye'], cat: ['🐈', 'Matcha Hırsızı Kedi'], teyze: ['👵', 'Pazarlıkçı Teyze'], drone: ['🚁', 'Hâlâ-Yolda Dronu'], crane: ['🏗️', 'Vinç Amca (Pazartesi)'], robot: ['🤖', 'Beklenmeyen Eşya Robotu'], ghost: ['👻', 'Doomscroll Hayaleti'] };
+  let [ch, name] = map[e.type]; if (e.sk && RESKIN[e.sk]) { ch = RESKIN[e.sk][1]; name = RESKIN[e.sk][2]; }
   if (e.type === 'ballerina' && e.tele) { const k = e.t / .9; ctx.strokeStyle = 'rgba(255,90,140,.9)'; ctx.lineWidth = 4; ctx.setLineDash([8, 6]); ctx.beginPath(); ctx.arc(e.tele.x, e.tele.y, 34 - k * 10, 0, 7); ctx.stroke(); ctx.setLineDash([]); emoji('⚠️', e.tele.x, e.tele.y, 22); }
   if (e.type === 'drone' && e.st === 1) { const n = Math.hypot(e.vx, e.vy) || 1, fl = .35 + .4 * Math.abs(Math.sin(time * 16)); ctx.strokeStyle = 'rgba(255,60,60,' + fl + ')'; ctx.lineWidth = 34; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + e.vx / n * 520, e.y + e.vy / n * 520); ctx.stroke(); ctx.strokeStyle = 'rgba(255,200,200,.9)'; ctx.lineWidth = 3; ctx.setLineDash([12, 9]); ctx.stroke(); ctx.setLineDash([]); ctx.lineCap = 'butt'; }
   if (e.type === 'ghost') ctx.globalAlpha = e.st === 1 ? .28 + .12 * Math.sin(time * 10) : 1;
@@ -777,13 +847,13 @@ function drawPunch() {
 /* ---------- hikaye ---------- */
 const WHO = {
   wolf: { n: 'Kurt', c: '#7fc4ff' }, prin: { n: 'Prenses', c: '#ff8ac6' }, narr: { n: 'Anlatıcı (Maaşsız)', c: '#e8d9a8', e: '📜' },
-  drum: { n: 'Tak Tak Sahurcu', c: '#ffb36b', e: '🥁' }, fund: { n: 'Kraliçe Vurgun', c: '#ffd84a', e: '💸' },
-  croc: { n: 'Bombardıman Timsahı', c: '#8bd66f', e: '🐊' }, ball: { n: 'Kapuçino Balerini', c: '#ffb0d9', e: '🩰' },
-  zam: { n: 'Zam Canavarı', c: '#ff6b6b', e: '🏷️' }, mafya: { n: 'Matcha Mafyası', c: '#b9bcc6', e: '🕶️' },
-  dolmus: { n: 'Dolmuş Şoförü', c: '#ffcf6b', e: '🚐' }, kargo: { n: 'Kargo Kuryesi', c: '#c9a06a', e: '🚚' }, cat: { n: 'Hırsız Kedi', c: '#ffd9a0', e: '🐈' }, teyze: { n: 'Poşet Teyze', c: '#e6a0d0', e: '👵' },
-  barista: { n: 'Stajyer Barista', c: '#d9a066', e: '☕' }, queue: { n: 'Kuyruktaki Adam', c: '#cfd6e2', e: '🧍' },
-  drone: { n: 'Dron Kurye', c: '#7fd6ff', e: '🚁' }, crane: { n: 'Vinç Operatörü', c: '#ffc34d', e: '🏗️' }, robot: { n: 'Kasa Robotu', c: '#9fb4c8', e: '🤖' }, ghost: { n: 'Fatura Hayaleti', c: '#d0c8ff', e: '👻' },
-  baron: { n: 'Franchise Baronu', c: '#ff5d73', e: '🕴️' }, imp: { n: 'Nevada İmparatoru', c: '#ffd84a', e: '👑' }
+  drum: { n: 'Tung Tak Sahurcu', c: '#ffb36b', e: '🥁' }, fund: { n: 'Kripto Abla', c: '#ffd84a', e: '💸' },
+  croc: { n: 'Bombardiro Timsahı', c: '#8bd66f', e: '🐊' }, ball: { n: 'Kapuçino Balerini', c: '#ffb0d9', e: '🩰' },
+  zam: { n: 'Enflasyon Goblini', c: '#ff6b6b', e: '🏷️' }, mafya: { n: 'Sigma Matcha Mafyası', c: '#b9bcc6', e: '🕶️' },
+  dolmus: { n: 'Dolmuş Abi (Müzik Açık)', c: '#ffcf6b', e: '🚐' }, kargo: { n: 'Hep "Dağıtımda" Kurye', c: '#c9a06a', e: '🚚' }, cat: { n: 'Matcha Hırsızı Kedi', c: '#ffd9a0', e: '🐈' }, teyze: { n: 'Pazarlıkçı Teyze', c: '#e6a0d0', e: '👵' },
+  barista: { n: 'Maaşsız Barista', c: '#d9a066', e: '☕' }, queue: { n: 'Sıradaki NPC', c: '#cfd6e2', e: '🧍' },
+  drone: { n: 'Hâlâ-Yolda Dronu', c: '#7fd6ff', e: '🚁' }, crane: { n: 'Vinç Amca (Pazartesi)', c: '#ffc34d', e: '🏗️' }, robot: { n: 'Beklenmeyen Eşya Robotu', c: '#9fb4c8', e: '🤖' }, ghost: { n: 'Doomscroll Hayaleti', c: '#d0c8ff', e: '👻' },
+  baron: { n: 'LinkedIn Baronu', c: '#ff5d73', e: '🕴️' }, brain: { n: 'Brainrot İmparatoru', c: '#ff4fd8', e: '🧠' }, rizz: { n: 'Rizzler', c: '#ff9ec7', e: '😏' }, imp: { n: 'Nevada İmparatoru', c: '#ffd84a', e: '👑' }
 };
 const STORY = {
   pre: {
@@ -841,14 +911,14 @@ const STORY = {
     ],
     5: [
       ['narr', 'Fiyat etiketleri havada uçuşmaya başladı. Hepsinin üstünde yalnızca iki kelime yazıyordu: "ZAM VAR".'],
-      ['zam', 'Ben Zam Canavarı\'yım. Bugünkü fiyat dünkünden pahalı, yarınki bugünkünden.'],
+      ['zam', 'Ben Enflasyon Goblini\'yım. Bugünkü fiyat dünkünden pahalı, yarınki bugünkünden.'],
       ['wolf', 'Her ay mı?'],
       ['zam', 'Her saniye.'],
       ['prin', 'Etiketler seni kovalayacak kurt! Hızlı topla, yoksa matcha da zamlanır!']
     ],
     6: [
       ['narr', 'Gabar\'ın en tepesinde, siyah gözlüklü bir gölge bekliyordu. Elinde bir fincan, ağzında "ben bu işin patronuyum" cümlesi.'],
-      ['mafya', 'Ben Matcha Mafyası\'yım. Bütün rakipler benim ekibim. Davulcu bana aylık ödeme yapıyor, balerin sigortamı.'],
+      ['mafya', 'Ben Sigma Matcha Mafyası\'yım. Bütün rakipler benim ekibim. Davulcu bana aylık ödeme yapıyor, balerin sigortamı.'],
       ['wolf', 'Davulcunun maaşı mı yok?'],
       ['mafya', 'Var. İşte bu yüzden kızgın.'],
       ['prin', 'Hepsi bir arada geliyor kurt. Hazır ol.']
@@ -891,7 +961,7 @@ const STORY = {
     ],
     11: [
       ['narr', 'Çölün en tepesindeki dev tabelanın altında, siyah ceketli bir figür bekliyordu.'],
-      ['baron', 'Ben Franchise Baronu\'yum. Her şube benim, her tabela benim, her sıra benim.'],
+      ['baron', 'Ben LinkedIn Baronu\'yum. Her şube benim, her tabela benim, her sıra benim.'],
       ['wolf', 'Benim sadece matcham var.'],
       ['baron', 'Matcha mı? Onu da şubemde satarım. Prenses de kasada çalışır.'],
       ['prin', 'Kasada çalışmak mı? Ben prensesim! Kurt, ona öyle vur ki, dolap bile bu kadar sert yememiştir!'],
@@ -1012,7 +1082,7 @@ const STORY = {
     ],
     29: [
       ['narr', 'Gece olunca metropolün faturaları hayalet oldu. Kimse bu faturaları ödemedi, ama hepsi sana geliyor.'],
-      ['ghost', 'Ben Fatura Hayaleti. Seni her ay görmeye geliyorum.'],
+      ['ghost', 'Ben Doomscroll Hayaleti. Seni her ay görmeye geliyorum.'],
       ['wolf', 'Ben abone olmadım.'],
       ['ghost', 'Aboneliğin otomatik yenilendi.'],
       ['prin', 'Soluklaşınca daha hızlı oluyor kurt, mesafeni koru!']
@@ -1046,18 +1116,25 @@ const STORY = {
       ['wolf', 'Ben sadece matcha topladım.'],
       ['imp', 'İşte bu yüzden tehlikelisin. Matcha toplayanlar bir gün şubeleri kapatır.'],
       ['prin', 'Kurt, bütün rakipleri biliyorsun. Hepsini atlat, bana ulaş!'],
-      ['narr', 'Ve böylece gerçek son bölüm başladı. Bu sefer ödenek çıktı. Hâlâ nereden olduğunu bilmiyoruz.']
-    ]
+      ['narr', 'Ve böylece Sezon 1\'in finali başladı. Bu sefer ödenek çıktı. Hâlâ nereden olduğunu bilmiyoruz.']
+    ],
+  34: [
+    ['narr', 'Sezon 1 bitti. İmparator düştü. Herkes eve gitti. Prenses kuleye döndü çünkü WiFi orada daha iyiydi.'],
+    ['narr', 'Ama internet unutmaz. Bir sabah "Büyük Meme Sıfırlaması" başladı: bütün eski şakalar silindi, yerine yenileri geldi, hepsi yarım.'],
+    ['prin', 'Kurt, ekranım tuhaf. Her yerde 6 ve 7 var.'],
+    ['wolf', 'Bu bir cope değil, kasıtlı. Hazırlan, yeni sezon.'],
+    ['rizz', 'Heyy. Matchaları bana ver, ben de sana "aura" vereyim. (Aura yok, yalan söyledim.)'],
+    ['narr', 'Sezon 2 başladı. Kimse istemedi. Bütçe yok. Aura var.']
+  ]
   },
   epilogue: [
-    ['narr', 'İmparator tahtından düştü. Tabelalar birer birer söndü. Dolmuşlar durdu, kediler uyudu, kuryeler paketleri geri aldı. Dağlarda yalnızca yıldızlar ve rüzgar kaldı.'],
-    ['imp', 'Bu hiç adil değil. Bende yeni bir kampanya vardı.'],
-    ['prin', 'Kurt, gerçekten kurtardın beni. Ama kule artık boş. Şimdi ne yapacağız?'],
-    ['wolf', 'Matcha demleyelim.'],
+    ['narr', 'Brainrot İmparatoru tahtından düştü. Ekranlar karardı. Skibidiler sifonu çekti, Moailer sustu, Ohio\'da mısırlar yeniden yeşerdi.'],
+    ['brain', 'Hayır... benim aura puanım... 9999 olmalıydı...'],
+    ['prin', 'Kurt, bu sefer gerçekten bitti galiba. Ya da yeni bir sezon gelecek.'],
+    ['wolf', 'Gelirse gelsin. Matcha demleriz.'],
     ['prin', 'Soğumuş olur.'],
-    ['wolf', 'Soğuk matcha da matcha.'],
-    ['narr', 'Şubelerin yarısı kapandı. Diğer yarısı "sezonluk" diye açık kaldı. 4.813. şubeye ise kimse girmiyor, ama tabelası hâlâ yanıyor.'],
-    ['narr', 'Son. (Bütçe bitti.) Bu hikâyedeki kişiler, şubeler ve fonlar tamamen kurgusaldır. Benzerlik kasıtlıysa şubeye bildirin.']
+    ['wolf', 'Soğuk matcha da matcha. Mmm.'],
+    ['narr', 'Son. (Sezon 3 için bütçe yok.) Bu hikâyedeki kişiler, memeler ve fonlar tamamen kurgusaldır. Benzerlik kasıtlıysa şubeye bildirin.']
   ]
 };
 let storyMode = true, cut = null;
@@ -1339,7 +1416,7 @@ function onNetData(d) {
 }
 function buildSnap() {
   const q = {
-    t: 'st', sc: scene, L, lv: lives, g: got, s: score, om: overMsg, wm: winMsg,
+    t: 'st', sc: scene, L, ip: +Math.max(0, introT).toFixed(2), lv: lives, g: got, s: score, om: overMsg, wm: winMsg,
     w: players.map(P => ({ x: +P.x.toFixed(1), y: +P.y.toFixed(1), f: P.face, e: +P.energyT.toFixed(2), dr: +P.drinkT.toFixed(2), st: P.stock, iv: +P.inv.toFixed(2), k: P.skin, o: P.on ? 1 : 0, h: P.hp, d: P.down ? 1 : 0, rv: +(P.rv || 0).toFixed(2) })),
     m: matchas.map(m => [Math.round(m.x), Math.round(m.y), m.gold ? 1 : 0, +m.ph.toFixed(1)]),
     r: rivals.map(e => { const o = { x: +e.x.toFixed(1), y: +e.y.toFixed(1), t: +e.t.toFixed(2), st: e.st, tele: e.tele || null, ln: e.lane || null, vx: Math.round(e.vx || 0), vy: Math.round(e.vy || 0), cr: e.carry ? 1 : 0, sn: +(e.stun || 0).toFixed(2) }; if (e.type === 'queue') o.sg = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => { const p = e.hist[Math.max(0, e.hist.length - 1 - k * 22)]; return [Math.round(p.x), Math.round(p.y)]; }); return o; }),
@@ -1357,7 +1434,7 @@ function applyEv(ev) {
 }
 function applySnap(d) {
   if (d.sc === 'cleared' || d.sc === 'over' || d.sc === 'final') { if (scene !== d.sc) { scene = d.sc; setBtns(); } }
-  L = d.L; lives = d.lv; got = d.g; score = d.s; overMsg = d.om; winMsg = d.wm;
+  L = d.L; introT = d.ip || 0; lives = d.lv; got = d.g; score = d.s; overMsg = d.om; winMsg = d.wm;
   d.w.forEach((q, i) => {
     const P = players[i]; if (!P) return; P.on = !!q.o; P.skin = q.k; P.stock = q.st; P.energyT = q.e; P.drinkT = q.dr; P.inv = q.iv; P.hp = q.h; P.down = !!q.d; P.rv = q.rv || 0;
     if (P === wolf) { const ex = q.x - P.x, ey = q.y - P.y, er = Math.hypot(ex, ey); if (er > 70) { P.x = q.x; P.y = q.y; } else if (er > 35) { P.x += ex * .25; P.y += ey * .25; } }
@@ -1374,7 +1451,8 @@ function applySnap(d) {
 }
 function guestUpdate(dt) {
   time += dt; if (shake > 0) shake -= dt;
-  if (!wolf.down) { const [vx, vy] = inputVec(); stepWolf(wolf, vx, vy, dt); }
+  if (introT > 0) introT -= dt;
+  if (!wolf.down && introT <= 0) { const [vx, vy] = inputVec(); stepWolf(wolf, vx, vy, dt); }
   const nw = performance.now(), k = 1 - Math.exp(-16 * dt);
   for (const P of players) if (P.on && P !== wolf && P.tx !== undefined) { const ex = Math.min(.16, (nw - P.qt) / 1000), gx = P.tx + (P.vx2 || 0) * ex, gy = P.ty + (P.vy2 || 0) * ex; P.x += (gx - P.x) * k; P.y += (gy - P.y) * k; P.moving = Math.hypot(gx - P.x, gy - P.y) > 2 || Math.hypot(P.vx2 || 0, P.vy2 || 0) > 20; }
   for (const e of rivals) if (e.qx !== undefined) { const ex = Math.min(.16, (nw - e.qt) / 1000), gx = e.qx + (e.v2x || 0) * ex, gy = e.qy + (e.v2y || 0) * ex; e.x += (gx - e.x) * k; e.y += (gy - e.y) * k; }
@@ -1604,14 +1682,27 @@ function drawHUD() {
 
 /* ---------- sahneler ---------- */
 function panel(x, y, w, h) { ctx.fillStyle = 'rgba(8,20,12,.78)'; rr(x, y, w, h, 24); ctx.fill(); ctx.strokeStyle = 'rgba(190,255,160,.35)'; ctx.lineWidth = 2; ctx.stroke(); }
+const BRAND = String.fromCharCode(75, 85, 68, 69, 80, 73);
+function drawSplash() {
+  ctx.fillStyle = '#05100a'; ctx.fillRect(0, 0, W, H);
+  const a = Math.min(1, splashT * 3, (1.6 - splashT) * 3), k = Math.min(1, splashT * 2);
+  ctx.globalAlpha = Math.max(0, a); txt(BRAND, W / 2, H / 2 - 10, 120 + k * 12, '#d8ffb0', 'center', '900'); txt('SUNAR', W / 2, H / 2 + 76, 38, '#fff', 'center', '800'); ctx.globalAlpha = 1;
+}
+function drawIntro() {
+  const a = Math.min(1, introT * 4, (1 - introT) * 4 + .2);
+  ctx.fillStyle = 'rgba(4,14,8,' + (.78 * Math.max(.3, a)) + ')'; ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = Math.max(0, Math.min(1, a)); txt(BRAND + ' SUNAR', W / 2, H / 2 - 20, 76, '#d8ffb0', 'center', '900');
+  txt('Bölüm ' + (L + 1) + ' · ' + LEVELS[L].name, W / 2, H / 2 + 46, 28, '#fff', 'center', '800'); ctx.globalAlpha = 1;
+}
+function drawMark() { ctx.globalAlpha = .55; txt('© ' + BRAND, 10, H - 10, 13, '#d8ffb0', 'left', '800', false); ctx.globalAlpha = 1; }
 function drawMenu() {
   ctx.drawImage(bgCache0, 0, 0, W, H);
   ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(0, 0, W, H);
   wolfSprite(115, 185, 2.4, 1, WOLF_SKINS[skinW], time, false); emoji('🍵', 845, 185, 90);
   txt('MATCHA AVI', W / 2, 130, 92, '#d8ffb0', 'center', '900');
   txt('GABAR DAĞLARI EFSANESİ', W / 2, 210, 28, '#fff');
-  wrap('Matcha topla, prenses kurtar, skill issue yaşama. (shitpost edition)', W / 2, 258, 880, 30, 21, '#e6f3ea', 'center');
-  txt('Dokunmatik, fare ya da klavye (WASD / ok tuşları, E = matcha iç)', W / 2, H - 22, 16, 'rgba(255,255,255,.65)', 'center', '600', false);
+  wrap('Matcha topla, prenses kurtar, skill issue yaşama. SEZON 2: Büyük Meme Sıfırlaması', W / 2, 258, 880, 30, 21, '#e6f3ea', 'center');
+  txt('Yapımcı: ' + BRAND + '  ·  Dokunmatik, fare ya da klavye (WASD / E)', W / 2, H - 22, 16, 'rgba(255,255,255,.65)', 'center', '600', false);
 }
 function drawStory() {
   ctx.drawImage(getBG(L), 0, 0, W, H); ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(0, 0, W, H);
@@ -1645,7 +1736,7 @@ let bgCache0 = getBG(0);
 /* ---------- ana çizim ---------- */
 function draw() {
   ctx.save(); ctx.clearRect(0, 0, W, H);
-  if (scene === 'menu') drawMenu(); else if (scene === 'skins') drawSkins(); else if (scene === 'cut') drawCut(); else if (['online', 'host', 'join', 'lobbyG', 'netlost', 'nick'].includes(scene)) drawNet(); else if (scene === 'story') drawStory(); else if (scene === 'final') drawFinal();
+  if (scene === 'splash') drawSplash(); else if (scene === 'menu') drawMenu(); else if (scene === 'skins') drawSkins(); else if (scene === 'cut') drawCut(); else if (['online', 'host', 'join', 'lobbyG', 'netlost', 'nick'].includes(scene)) drawNet(); else if (scene === 'story') drawStory(); else if (scene === 'final') drawFinal();
   else {
     if (shake > 0) ctx.translate(rand(-5, 5) * shake * 3, rand(-5, 5) * shake * 3);
     updateCam(); ctx.translate(-cam.x, -cam.y);
@@ -1663,10 +1754,11 @@ function draw() {
     ctx.restore(); ctx.save();
     drawPunch();
     drawHUD();
+    if (introT > 0) drawIntro();
     if (paused) { ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(0, 0, W, H); txt('DURAKLATILDI', W / 2, H / 2 - 20, 64, '#fff', 'center', '900'); txt('Devam için ❚❚ düğmesine dokun', W / 2, H / 2 + 40, 24, '#cde'); }
     if (scene === 'over') drawOver(); if (scene === 'cleared') drawCleared();
   }
-  drawBtns(); ctx.restore();
+  drawBtns(); drawMark(); ctx.restore();
 }
 
 /* ---------- girdi ---------- */
@@ -1710,6 +1802,7 @@ function loop(now) {
   const rdt = (now - last) / 1000; const dt = Math.min(.05, rdt); last = now;
   if (rdt > 0 && rdt < 1) { fpsAcc += rdt; fpsN++; if (fpsAcc > 2) { const f = fpsN / fpsAcc; if (f < 38 && !LITE) LITE = true; else if (f > 56 && LITE && fpsAcc > 6) LITE = false; fpsAcc = 0; fpsN = 0; } }
   if (scene === 'cut' && cut) { const ln = cut.lines[cut.i]; if (cut.c < ln[1].length) { const before = Math.floor(cut.c / 3); cut.c = Math.min(ln[1].length, cut.c + dt * 48); if (Math.floor(cut.c / 3) !== before && ln[0] !== 'narr') beep(ln[0] === 'wolf' ? 210 : 330 + (ln[0].length * 17) % 120, .03, 'square', .02); } }
+  if (scene === 'splash') { splashT += dt; if (splashT > 1.6) { scene = 'menu'; setBtns(); } }
   if (punch) { punch.t += dt; if (punch.t > .95) punch = null; }
   try {
   if (scene === 'play' || scene === 'over' || scene === 'cleared') { if (scene === 'play') { if (net.role === 'guest') guestUpdate(dt); else update(dt); } else { time += dt; parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; }); parts = parts.filter(p => p.life > 0); } } else time += dt;
