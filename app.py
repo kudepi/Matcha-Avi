@@ -23,5 +23,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-GAME_HTML = (Path(__file__).parent / "game.html").read_text(encoding="utf-8")
+HERE = Path(__file__).parent
+GAME_HTML = (HERE / "game.html").read_text(encoding="utf-8")
+PEER_JS = HERE / "peerjs.min.js"
+if PEER_JS.exists():  # çevrimiçi co-op için PeerJS'i oyunun içine göm
+    GAME_HTML = GAME_HTML.replace("<!--PEERJS-->", "<script>" + PEER_JS.read_text(encoding="utf-8") + "</script>")
 components.html(GAME_HTML, height=800, scrolling=False)

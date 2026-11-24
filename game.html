@@ -12,6 +12,7 @@
 </head>
 <body>
 <div id="wrap"><canvas id="c" width="960" height="600" tabindex="0"></canvas></div>
+<!--PEERJS-->
 <script>
 "use strict";
 const W = 960, H = 600, FIELD_TOP = 125, FIELD_BOT = H - 24;
@@ -127,7 +128,7 @@ let progress = 0, L = 0;
 try { progress = +(localStorage.getItem('matchaProg') || 0) || 0; } catch (e) { }
 function saveProg() { try { localStorage.setItem('matchaProg', progress); } catch (e) { } }
 
-let punch = null, wolf, matchas, rocks, rivals, hazards, parts, princess, lives, got, score, inv, shake, bgCache, popups, dashCd, paused = false;
+let punch = null, players = [], maxLives = 3, wolf, matchas, rocks, rivals, hazards, parts, princess, lives, got, score, inv, shake, bgCache, popups, dashCd, paused = false;
 const joyState = { id: null, ox: 0, oy: 0, x: 0, y: 0 };
 const keys = {};
 const dashBtn = { x: W - 105, y: H - 90, r: 56 };
@@ -212,8 +213,10 @@ function getBG(i) { return bgs[i] || (bgs[i] = makeBG(i)); }
 /* ---------- bölüm başlat ---------- */
 function startLevel(i) {
   L = i; const lv = LEVELS[i];
-  wolf = { x: 110, y: H - 90, r: 17, dir: 1, energyT: 0, drinkT: 0, stock: 1, trail: [], face: 1 };
-  lives = 3; got = 0; inv = 0; shake = 0; dashCd = 0; matchas = []; rocks = []; rivals = []; hazards = []; parts = []; popups = []; princess = null; paused = false;
+  const online = !!net.role, isG = net.role === 'guest';
+  players = [mkWolf(110, H - 90, isG ? net.hostSkin : skinW, !isG), mkWolf(175, H - 135, isG ? skinW : net.p2skin, isG)];
+  players[1].on = online; wolf = players[isG ? 1 : 0]; maxLives = online ? 4 : 3;
+  lives = maxLives; got = 0; inv = 0; shake = 0; dashCd = 0; matchas = []; rocks = []; rivals = []; hazards = []; parts = []; popups = []; princess = null; paused = false;
   if (i === 0 || !score) score = 0;
   bgCache = getBG(i);
   const R = mulberry(500 + i * 31);
@@ -234,6 +237,7 @@ function startLevel(i) {
     rivals.push(e);
   });
   scene = 'play'; btns = [];
+  if (net.role === 'host') netSend({ t: 'start', L: i, hs: skinW });
 }
 function spawnMatcha(gold) {
   for (let tries = 0; tries < 60; tries++) {
@@ -245,9 +249,11 @@ function spawnMatcha(gold) {
 /* ---------- oynanış ---------- */
 function burst(x, y, col, n) { for (let i = 0; i < n; i++) { const a = Math.random() * 6.28, s = rand(40, 200); parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(.3, .8), max: .8, col, r: rand(2, 5) }); } }
 function popup(s, x, y, col) { popups.push({ s, x, y, life: 1, col: col || '#fff' }); }
-function hurt() {
-  if (inv > 0 || scene !== 'play') return;
-  lives--; inv = 1.7; shake = .5; punch = { t: 0 }; sfx.hurt(); burst(wolf.x, wolf.y, '#c9ced6', 22); popup(pick(MEME_HURT), wolf.x, wolf.y - 30, '#e6e9ee');
+function hurt(w) {
+  w = w || wolf; if (w.inv > 0 || scene !== 'play') return;
+  lives--; w.inv = 1.7; shake = .5;
+  if (w === wolf) punch = { t: 0 }; else if (net.role === 'host') net.evq.push(['pu', players.indexOf(w)]);
+  sfx.hurt(); burst(w.x, w.y, '#c9ced6', 22); popup(pick(MEME_HURT), w.x, w.y - 30, '#e6e9ee');
   if (lives <= 0) { overMsg = pick(MEME_OVER); scene = 'over'; sfx.lose(); setBtns(); }
 }
 const MEME_PICK = ['+1', 'aura +100', 'W', 'sigma', 'ez', 'based', 'gg', 'mood', 'çok iyi'], MEME_GOLD = ['GIGACHAD +2', 'jackpot', 'bro cooked'],
@@ -255,11 +261,14 @@ const MEME_PICK = ['+1', 'aura +100', 'W', 'sigma', 'ez', 'based', 'gg', 'mood',
   MEME_OVER = ['Skill issue.', 'Bro got cooked', 'L + ratio + dolap', 'Kurt yakalandı!'], MEME_WIN = ['GG EZ', 'W Prenses', 'Prenses Kurtarıldı!', 'Çok yaşa W'];
 const pick = a => a[Math.floor(Math.random() * a.length)];
 let overMsg = '', winMsg = '';
+function drink(w) {
+  if (scene !== 'play' || paused || w.drinkT > 0) return;
+  if (w.stock <= 0) { if (w === wolf) popup('matcha yok!', w.x, w.y - 34, '#ffb3b3'); return; }
+  w.stock--; w.drinkT = .45; w.energyT = 4.2; sfx.slurp(); burst(w.x, w.y - 10, '#9be36b', 20); popup(pick(MEME_DRINK), w.x, w.y - 40, '#c6f08a');
+}
 function doDash() {
-  if (scene !== 'play' || paused) return;
-  if (wolf.drinkT > 0) return;
-  if (wolf.stock <= 0) { popup('matcha yok!', wolf.x, wolf.y - 34, '#ffb3b3'); return; }
-  wolf.stock--; wolf.drinkT = .45; wolf.energyT = 4.2; sfx.slurp(); burst(wolf.x, wolf.y - 10, '#9be36b', 20); popup(pick(MEME_DRINK), wolf.x, wolf.y - 40, '#c6f08a');
+  if (net.role === 'guest') { if (scene === 'play' && wolf.stock > 0 && wolf.drinkT <= 0) netSend({ t: 'dr' }); return; }
+  drink(wolf);
 }
 function inputVec() {
   let vx = 0, vy = 0;
@@ -269,53 +278,58 @@ function inputVec() {
   const m = Math.hypot(vx, vy); if (m > 1) { vx /= m; vy /= m; }
   return [vx, vy];
 }
-function update(dt) {
-  time += dt; if (paused) return;
-  const lv = LEVELS[L];
-  // kurt
-  const [vx, vy] = inputVec();
+function mkWolf(x, y, skin, local) { return { x, y, r: 17, dir: 1, energyT: 0, drinkT: 0, stock: 1, trail: [], face: 1, inv: 0, skin, on: true, local, in: { vx: 0, vy: 0 }, moving: false }; }
+function nearest(o) { let b = null, bd = 1e9; for (const P of players) if (P.on) { const d = dist(o, P); if (d < bd) { bd = d; b = P; } } return b || players[0]; }
+function stepWolf(wolf, vx, vy, dt) {
   const slow = hazards.some(h => h.k === 'puddle' && dist(h, wolf) < h.r) ? .5 : 1;
   const sp = 235 * slow * (wolf.energyT > 0 ? 1.75 : 1) * (wolf.drinkT > 0 ? .35 : 1);
-  wolf.x += vx * sp * dt; wolf.y += vy * sp * dt;
+  wolf.x += vx * sp * dt; wolf.y += vy * sp * dt; wolf.moving = !!(vx || vy);
   if (vx > .1) wolf.face = 1; else if (vx < -.1) wolf.face = -1;
   wolf.x = clamp(wolf.x, 24, W - 24); wolf.y = clamp(wolf.y, FIELD_TOP, FIELD_BOT);
   for (const o of rocks) { const d = dist(wolf, o), m = o.r + wolf.r - 4; if (d < m && d > 0) { wolf.x = o.x + (wolf.x - o.x) / d * m; wolf.y = o.y + (wolf.y - o.y) / d * m; } }
-  { const sk0 = WOLF_SKINS[skinW]; if (sk0.trail && (vx || vy) && Math.random() < dt * 28) parts.push({ x: wolf.x - vx * 10 + rand(-5, 5), y: wolf.y + 8 + rand(-3, 3), vx: rand(-12, 12), vy: rand(-26, -6), life: .55, max: .55, col: sk0.trail, ch: sk0.te, r: sk0.te ? rand(2.4, 3.4) : rand(1.5, 3.2) }); }
+  { const sk0 = WOLF_SKINS[wolf.skin]; if (sk0.trail && (vx || vy) && Math.random() < dt * 28) parts.push({ x: wolf.x - vx * 10 + rand(-5, 5), y: wolf.y + 8 + rand(-3, 3), vx: rand(-12, 12), vy: rand(-26, -6), life: .55, max: .55, col: sk0.trail, ch: sk0.te, r: sk0.te ? rand(2.4, 3.4) : rand(1.5, 3.2) }); }
   if (wolf.energyT > 0) { wolf.energyT -= dt; wolf.trail.push({ x: wolf.x, y: wolf.y, l: .3 }); }
   if (wolf.drinkT > 0) wolf.drinkT -= dt;
   wolf.trail.forEach(p => p.l -= dt); wolf.trail = wolf.trail.filter(p => p.l > 0);
-  if (dashCd > 0) dashCd -= dt; if (inv > 0) inv -= dt; if (shake > 0) shake -= dt;
-
-  // matcha topla
+  if (wolf.inv > 0) wolf.inv -= dt;
+}
+function update(dt) {
+  time += dt; if (paused) return;
+  const lv = LEVELS[L];
+  for (const P of players) { if (!P.on) continue; if (P.local) { const [vx, vy] = inputVec(); stepWolf(P, vx, vy, dt); } else stepWolf(P, P.in.vx, P.in.vy, dt); }
+  if (shake > 0) shake -= dt;
+  for (const wolf of players) {
+    if (!wolf.on) continue;
   for (let i = matchas.length - 1; i >= 0; i--) {
-    const m = matchas[i]; if (dist(m, wolf) < m.r + wolf.r + 4 + (wolf.energyT > 0 ? 46 : 0)) {
-      wolf.stock = Math.min(3, wolf.stock + 1);
-      matchas.splice(i, 1); const add = m.gold ? 2 : 1; got += add; score += m.gold ? 300 : 100;
-      burst(m.x, m.y, m.gold ? '#ffd84a' : '#9be36b', m.gold ? 26 : 14); popup(m.gold ? pick(MEME_GOLD) : pick(MEME_PICK), m.x, m.y - 20, m.gold ? '#ffd84a' : '#d8ffc0');
-      m.gold ? sfx.gold() : sfx.pick();
-      if (got >= lv.quota && !princess) {
-        let px = wolf.x < W / 2 ? W - 100 : 100, py = wolf.y < H / 2 ? H - 80 : FIELD_TOP + 70;
-        princess = { x: px, y: py, t: 0 }; popup('Prenses göründü!', W / 2, FIELD_TOP + 20, '#ffe08a'); sfx.win(); burst(px, py, '#ffe08a', 40);
-        matchas.length = 0; break;
+      const m = matchas[i]; if (dist(m, wolf) < m.r + wolf.r + 4 + (wolf.energyT > 0 ? 46 : 0)) {
+        wolf.stock = Math.min(3, wolf.stock + 1);
+        matchas.splice(i, 1); const add = m.gold ? 2 : 1; got += add; score += m.gold ? 300 : 100;
+        burst(m.x, m.y, m.gold ? '#ffd84a' : '#9be36b', m.gold ? 26 : 14); popup(m.gold ? pick(MEME_GOLD) : pick(MEME_PICK), m.x, m.y - 20, m.gold ? '#ffd84a' : '#d8ffc0');
+        m.gold ? sfx.gold() : sfx.pick();
+        if (got >= lv.quota && !princess) {
+          let px = wolf.x < W / 2 ? W - 100 : 100, py = wolf.y < H / 2 ? H - 80 : FIELD_TOP + 70;
+          princess = { x: px, y: py, t: 0 }; popup('Prenses göründü!', W / 2, FIELD_TOP + 20, '#ffe08a'); sfx.win(); burst(px, py, '#ffe08a', 40);
+          matchas.length = 0; break;
+        }
       }
     }
   }
   if (!princess && matchas.length < lv.quota - got + 1) spawnMatcha(Math.random() < .15);
-  if (princess) { princess.t += dt; if (dist(princess, wolf) < 40) { score += lives * 200; winMsg = pick(MEME_WIN); scene = 'cleared'; sfx.win(); burst(princess.x, princess.y, '#ffd84a', 60); if (L + 1 > progress) { progress = Math.min(L + 1, LEVELS.length - 1); saveProg(); } setBtns(); } }
+  if (princess) { princess.t += dt; if (players.some(P => P.on && dist(princess, P) < 40)) { score += lives * 200; winMsg = pick(MEME_WIN); scene = 'cleared'; sfx.win(); burst(princess.x, princess.y, '#ffd84a', 60); if (L + 1 > progress) { progress = Math.min(L + 1, LEVELS.length - 1); saveProg(); } setBtns(); } }
 
   // rakipler
   const lvf = 1 + L * .06;
   for (const e of rivals) {
-    e.t += dt;
+    e.t += dt; const wolf = nearest(e);
     if (e.type === 'drummer') {
       const a = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.x += Math.cos(a) * 52 * lvf * dt; e.y += Math.sin(a) * 52 * lvf * dt; e.y = clamp(e.y, FIELD_TOP, FIELD_BOT);
       if (e.t > 3.3) { e.t = 0; hazards.push({ k: 'ring', x: e.x, y: e.y, r: 10, max: 260 }); sfx.warn(); }
-      if (dist(e, wolf) < 34) hurt();
+      if (dist(e, wolf) < 34) hurt(wolf);
     } else if (e.type === 'fund') {
       if (dist(e, { x: e.tx, y: e.ty }) < 12 || e.st === 0) { e.st = 1; e.tx = rand(80, W - 80); e.ty = rand(FIELD_TOP + 30, FIELD_BOT - 40); }
       const a = Math.atan2(e.ty - e.y, e.tx - e.x); e.x += Math.cos(a) * 75 * dt; e.y += Math.sin(a) * 75 * dt;
       if (e.t > 1.7 / lvf) { e.t = 0; const b = Math.atan2(wolf.y - e.y, wolf.x - e.x); hazards.push({ k: 'coin', x: e.x, y: e.y, vx: Math.cos(b) * 235, vy: Math.sin(b) * 235, life: 4 }); sfx.warn(); }
-      if (dist(e, wolf) < 34) hurt();
+      if (dist(e, wolf) < 34) hurt(wolf);
     } else if (e.type === 'croc') {
       e.x += e.vx * dt; if (e.x < 60 || e.x > W - 60) e.vx *= -1; e.y = 92 + Math.sin(time * 2) * 10;
       if (e.t > 2.6 / lvf) { e.t = 0; hazards.push({ k: 'bomb', x: wolf.x + rand(-30, 30), y: wolf.y + rand(-30, 30), t: 0, fuse: 1.35, r: 72 }); sfx.warn(); }
@@ -323,17 +337,17 @@ function update(dt) {
       if (e.st === 0) { const a = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.x += Math.cos(a) * 55 * dt; e.y += Math.sin(a) * 55 * dt; if (e.t > 3.4) { e.st = 1; e.t = 0; const ang = Math.random() * 6.28; e.tele = { x: clamp(wolf.x + Math.cos(ang) * 190, 40, W - 40), y: clamp(wolf.y + Math.sin(ang) * 190, FIELD_TOP + 10, FIELD_BOT) }; sfx.warn(); } }
       else if (e.st === 1) { if (e.t > .9) { e.x = e.tele.x; e.y = e.tele.y; e.st = 2; e.t = 0; const a = Math.atan2(wolf.y - e.y, wolf.x - e.x); e.vx = Math.cos(a) * 390; e.vy = Math.sin(a) * 390; e.tele = null; sfx.dash(); } }
       else if (e.st === 2) { e.x += e.vx * dt; e.y += e.vy * dt; e.x = clamp(e.x, 20, W - 20); e.y = clamp(e.y, FIELD_TOP, FIELD_BOT); if (e.t > .65) { e.st = 0; e.t = 0; } }
-      if (dist(e, wolf) < 32) hurt();
+      if (dist(e, wolf) < 32) hurt(wolf);
     } else if (e.type === 'barista') {
       if (dist(e, { x: e.tx, y: e.ty }) < 12 || e.st === 0) { e.st = 1; e.tx = rand(80, W - 80); e.ty = rand(FIELD_TOP + 30, FIELD_BOT - 40); }
       const a = Math.atan2(e.ty - e.y, e.tx - e.x); e.x += Math.cos(a) * 62 * dt; e.y += Math.sin(a) * 62 * dt;
       if (e.t > 2.3 / lvf) { e.t = 0; hazards.push({ k: 'cup', sx: e.x, sy: e.y, tx: clamp(wolf.x + rand(-30, 30), 30, W - 30), ty: clamp(wolf.y + rand(-30, 30), FIELD_TOP + 10, FIELD_BOT), t: 0, fly: .95 }); sfx.warn(); }
-      if (dist(e, wolf) < 34) hurt();
+      if (dist(e, wolf) < 34) hurt(wolf);
     } else if (e.type === 'queue') {
       e.hx += e.dir * 105 * lvf * dt; e.hy = clamp(e.base + Math.sin(e.t * 1.7) * 85, FIELD_TOP + 10, FIELD_BOT - 10);
       if (e.hx > W + 260) { e.dir = -1; e.base = rand(FIELD_TOP + 80, FIELD_BOT - 80); } else if (e.hx < -260) { e.dir = 1; e.base = rand(FIELD_TOP + 80, FIELD_BOT - 80); }
       e.hist.push({ x: e.hx, y: e.hy }); if (e.hist.length > 400) e.hist.shift(); e.x = e.hx; e.y = e.hy;
-      for (let k = 0; k < 10; k++) { const sg = e.hist[Math.max(0, e.hist.length - 1 - k * 22)]; if (dist(sg, wolf) < 22) { hurt(); break; } }
+      for (let k = 0; k < 10; k++) { const sg = e.hist[Math.max(0, e.hist.length - 1 - k * 22)]; let hitQ = false; for (const P of players) if (P.on && dist(sg, P) < 22) { hurt(P); hitQ = true; } if (hitQ) break; }
     } else if (e.type === 'zam' || e.type === 'baron') {
       e.x = W / 2 + Math.sin(time * .6) * 330; e.y = 90 + Math.sin(time * 1.3) * 12;
       if (e.t > (e.type === 'baron' ? 2.8 : 3.4) && e.minions < 6) { e.t = 0; e.minions++; hazards.push({ k: 'tag', x: e.x, y: e.y + 20, life: 13, own: e, v: 0 }); sfx.warn(); }
@@ -341,12 +355,12 @@ function update(dt) {
   }
   // tehlikeler
   for (const h of hazards) {
-    if (h.k === 'ring') { h.r += 150 * dt; if (Math.abs(dist(h, wolf) - h.r) < 12) hurt(); if (h.r > h.max) h.dead = true; }
-    else if (h.k === 'coin') { h.x += h.vx * dt; h.y += h.vy * dt; h.life -= dt; if (h.life <= 0 || h.x < -20 || h.x > W + 20 || h.y < 60 || h.y > H + 20) h.dead = true; if (dist(h, wolf) < 22) { hurt(); h.dead = true; } }
-    else if (h.k === 'bomb') { h.t += dt; if (h.t >= h.fuse && !h.boom) { h.boom = .35; sfx.boom(); shake = .2; burst(h.x, h.y, '#ffb347', 28); if (dist(h, wolf) < h.r + wolf.r - 6) hurt(); } if (h.boom) { h.boom -= dt; if (h.boom <= 0) h.dead = true; } }
-    else if (h.k === 'cup') { h.t += dt; if (h.t >= h.fly) { h.dead = true; hazards.push({ k: 'puddle', x: h.tx, y: h.ty, life: 5.5, r: 50 }); burst(h.tx, h.ty, '#8a5a3a', 12); sfx.boom(); if (dist({ x: h.tx, y: h.ty }, wolf) < 30) hurt(); } }
+    if (h.k === 'ring') { h.r += 150 * dt; for (const P of players) if (P.on && Math.abs(dist(h, P) - h.r) < 12) hurt(P); if (h.r > h.max) h.dead = true; }
+    else if (h.k === 'coin') { h.x += h.vx * dt; h.y += h.vy * dt; h.life -= dt; if (h.life <= 0 || h.x < -20 || h.x > W + 20 || h.y < 60 || h.y > H + 20) h.dead = true; for (const P of players) if (P.on && !h.dead && dist(h, P) < 22) { hurt(P); h.dead = true; } }
+    else if (h.k === 'bomb') { h.t += dt; if (h.t >= h.fuse && !h.boom) { h.boom = .35; sfx.boom(); shake = .2; burst(h.x, h.y, '#ffb347', 28); for (const P of players) if (P.on && dist(h, P) < h.r + P.r - 6) hurt(P); } if (h.boom) { h.boom -= dt; if (h.boom <= 0) h.dead = true; } }
+    else if (h.k === 'cup') { h.t += dt; if (h.t >= h.fly) { h.dead = true; hazards.push({ k: 'puddle', x: h.tx, y: h.ty, life: 5.5, r: 50 }); burst(h.tx, h.ty, '#8a5a3a', 12); sfx.boom(); for (const P of players) if (P.on && dist({ x: h.tx, y: h.ty }, P) < 30) hurt(P); } }
     else if (h.k === 'puddle') { h.life -= dt; if (h.life <= 0) h.dead = true; }
-    else if (h.k === 'tag') { h.life -= dt; h.v = Math.min(h.v + 22 * dt, 175); const a = Math.atan2(wolf.y - h.y, wolf.x - h.x); h.x += Math.cos(a) * (70 + h.v) * dt; h.y += Math.sin(a) * (70 + h.v) * dt; h.y = Math.max(h.y, FIELD_TOP - 20); if (dist(h, wolf) < 24) { hurt(); h.life = 0; } if (h.life <= 0) { h.dead = true; h.own.minions--; } }
+    else if (h.k === 'tag') { const T = nearest(h); h.life -= dt; h.v = Math.min(h.v + 22 * dt, 175); const a = Math.atan2(T.y - h.y, T.x - h.x); h.x += Math.cos(a) * (70 + h.v) * dt; h.y += Math.sin(a) * (70 + h.v) * dt; h.y = Math.max(h.y, FIELD_TOP - 20); if (dist(h, T) < 24) { hurt(T); h.life = 0; } if (h.life <= 0) { h.dead = true; h.own.minions--; } }
   }
   hazards = hazards.filter(h => !h.dead);
   parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .93; p.vy *= .93; p.life -= dt; }); parts = parts.filter(p => p.life > 0);
@@ -423,14 +437,15 @@ function wolfSprite(x, y, sc, face, sk, t, moving) {
   if (sk.acc) sk.acc.forEach(a => emoji(a[0], a[1] * dir, a[2] + bob, a[3]));
   ctx.restore();
 }
-function drawWolf() {
-  const sk = WOLF_SKINS[skinW];
+function drawWolf(wolf) {
+  const sk = WOLF_SKINS[wolf.skin];
   wolf.trail.forEach(p => { ctx.globalAlpha = p.l / .3 * .4; ctx.fillStyle = '#9be36b'; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, 7); ctx.fill(); }); ctx.globalAlpha = 1;
-  if (inv > 0 && Math.floor(time * 14) % 2 === 0) return;
+  if (wolf.inv > 0 && Math.floor(time * 14) % 2 === 0) return;
   shadow(wolf.x, wolf.y, 18);
   if (wolf.energyT > 0) { ctx.globalAlpha = .4 + .2 * Math.sin(time * 12); const eg = ctx.createRadialGradient(wolf.x, wolf.y, 8, wolf.x, wolf.y, 42); eg.addColorStop(0, 'rgba(150,255,110,.9)'); eg.addColorStop(1, 'rgba(150,255,110,0)'); ctx.fillStyle = eg; ctx.beginPath(); ctx.arc(wolf.x, wolf.y, 42, 0, 7); ctx.fill(); ctx.globalAlpha = 1; }
-  const iv = inputVec(); wolfSprite(wolf.x, wolf.y, 1, wolf.face, sk, time, iv[0] || iv[1]);
+  wolfSprite(wolf.x, wolf.y, 1, wolf.face, sk, time, wolf.moving);
   if (wolf.drinkT > 0) { const q = 1 - wolf.drinkT / .45; emoji('🍵', wolf.x + wolf.face * 16, wolf.y - 28 - Math.sin(q * 3.14) * 8, 26); }
+  if (net.role) txt(wolf === players[0] ? 'P1' : 'P2', wolf.x, wolf.y - 36, 13, wolf === players[0] ? '#7fc4ff' : '#ffb36b', 'center', '800', false);
 }
 function drawPrincess(p, skinIdx, sc, label) { princessSprite(p.x, p.y, p.t, PRINCESS_SKINS[skinIdx === undefined ? skinP : skinIdx], sc || 1, label !== false); }
 function princessSprite(px, py, t, sk, sc, label) {
@@ -692,7 +707,7 @@ function advanceCut() {
   if (cut.i >= cut.lines.length) { const d = cut.done; cut = null; d(); }
 }
 function beginLevelFlow(i) {
-  L = i; const lines = STORY.pre[i];
+  L = i; if (net.role) { startLevel(i); return; } const lines = STORY.pre[i];
   if (storyMode && lines) runCut(lines, i, () => { scene = 'story'; setBtns(); }); else { scene = 'story'; setBtns(); }
 }
 function wrapLines(str, maxW, size) {
@@ -727,6 +742,170 @@ function drawCut() {
   txt((cut.i + 1) + ' / ' + cut.lines.length, 76, 545, 15, 'rgba(255,255,255,.45)', 'left', '600', false);
 }
 
+/* ---------- çevrimiçi co-op (PeerJS, oda kodu) ---------- */
+const CODE_CH = 'ABCDEFGHJKMNPRSTUVYZ23456789';
+const net = { lastRx: 0, ping: 0, role: null, peer: null, conn: null, code: '', status: '', joined: false, evq: [], acc: 0, startL: 0, hostSkin: 0, p2skin: 0 };
+let joinCode = '';
+const _popup = popup, _burst = burst, _sfx = Object.assign({}, sfx);
+popup = function (s2, x, y, c) { _popup(s2, x, y, c); if (net.role === 'host') net.evq.push(['p', s2, x, y, c]); };
+burst = function (x, y, col, n) { _burst(x, y, col, n); if (net.role === 'host') net.evq.push(['b', x, y, col, n]); };
+Object.keys(sfx).forEach(n => { if (n === 'ui') return; sfx[n] = function () { _sfx[n](); if (net.role === 'host') net.evq.push(['s', n]); }; });
+function netSend(o) { try { if (net.conn && net.conn.open) net.conn.send(o); } catch (e) { } }
+function peerOpts() { return window.PEER_CFG || { config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:global.stun.twilio.com:3478' }, { urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turn:openrelay.metered.ca:443?transport=tcp'], username: 'openrelayproject', credential: 'openrelayproject' }] } }; }
+function ensurePeerLib(cb) {
+  if (typeof Peer !== 'undefined') return cb(true);
+  const sc = document.createElement('script'); sc.src = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
+  sc.onload = () => cb(typeof Peer !== 'undefined'); sc.onerror = () => cb(false); document.head.appendChild(sc);
+}
+function errMsg(err) {
+  const t = err && err.type;
+  if (t === 'peer-unavailable') return 'Oda bulunamadı. Kodu kontrol et.';
+  if (t === 'network' || t === 'server-error' || t === 'socket-error' || t === 'socket-closed') return 'Eşleştirme sunucusuna ulaşılamadı. Ağ engelliyor olabilir.';
+  if (t === 'browser-incompatible') return 'Bu tarayıcı çevrimiçi oyunu desteklemiyor.';
+  return 'Bağlantı hatası' + (t ? ' (' + t + ')' : '') + '.';
+}
+function netReset(msg) {
+  try { net.conn && net.conn.close(); } catch (e) { } try { net.peer && net.peer.destroy(); } catch (e) { }
+  net.role = null; net.peer = null; net.conn = null; net.joined = false; net.code = ''; net.status = msg || ''; net.evq = []; net.p2skin = 0; net.hostSkin = 0;
+  if (players[1]) players[1].on = false; if (players[0]) wolf = players[0];
+}
+function leaveNet() { netReset(''); scene = 'menu'; setBtns(); }
+function netLost() {
+  if (!net.role) return;
+  const was = scene; netReset('Bağlantı koptu.');
+  if (['play', 'cleared', 'over', 'final', 'lobbyG', 'host'].includes(was)) { scene = 'netlost'; setBtns(); } else if (was === 'join') { setBtns(); }
+}
+function newCode() { let c = ''; for (let i = 0; i < 4; i++) c += CODE_CH[Math.floor(Math.random() * CODE_CH.length)]; return c; }
+function setupConn(conn, isHost) {
+  const onOpen = () => {
+    net.conn = conn; net.joined = true; net.lastRx = performance.now(); net.ping = 0;
+    if (isHost) { net.status = 'Oyuncu 2 bağlandı!'; net.startL = clamp(progress, 0, LEVELS.length - 1); }
+    else { net.role = 'guest'; scene = 'lobbyG'; net.status = 'Bağlandı! Host oyunu başlatacak...'; netSend({ t: 'hi', skin: skinW }); }
+    setBtns();
+  };
+  conn.on('open', onOpen);
+  conn.on('data', onNetData);
+  conn.on('close', netLost);
+  conn.on('error', () => netLost());
+  if (conn.open) onOpen();
+}
+function hostRoom(tries) {
+  net.status = 'Oda kuruluyor...';
+  ensurePeerLib(ok => {
+    if (!ok) { net.status = 'Çevrimiçi kütüphane yüklenemedi (ağ engelliyor olabilir).'; return; }
+    const code = newCode(); const peer = new Peer('matchaavi-' + code, Object.assign({}, peerOpts(), { debug: 0 }));
+    net.peer = peer; net.code = code; net.role = 'host'; net.joined = false;
+    peer.on('open', () => { net.status = 'Oda hazır. Arkadaşını bekliyor...'; });
+    peer.on('error', err => { if (err.type === 'unavailable-id' && tries < 6) { peer.destroy(); hostRoom(tries + 1); } else net.status = errMsg(err); });
+    peer.on('connection', conn => { if (net.conn) { try { conn.close(); } catch (e) { } return; } setupConn(conn, true); });
+  });
+}
+function tryJoin() { if (joinCode.length === 4) joinRoom(joinCode); else net.status = '4 haneli kodu gir.'; }
+function joinRoom(code) {
+  net.status = 'Bağlanılıyor...';
+  ensurePeerLib(ok => {
+    if (!ok) { net.status = 'Çevrimiçi kütüphane yüklenemedi (ağ engelliyor olabilir).'; return; }
+    try { net.peer && net.peer.destroy(); } catch (e) { }
+    const peer = new Peer(undefined, Object.assign({}, peerOpts(), { debug: 0 })); net.peer = peer; net.role = null;
+    let done = false;
+    const fail = m => { if (done) return; done = true; net.status = m; try { peer.destroy(); } catch (e) { } net.peer = null; net.role = null; };
+    const to = setTimeout(() => fail('Bağlanılamadı. Kod yanlış ya da ağ engelliyor olabilir.'), 12000);
+    peer.on('error', err => { clearTimeout(to); fail(errMsg(err)); });
+    peer.on('open', () => {
+      const conn = peer.connect('matchaavi-' + code, { reliable: true, serialization: 'json' });
+      conn.on('open', () => { if (done) return; done = true; clearTimeout(to); });
+      setupConn(conn, false);
+    });
+  });
+}
+function onNetData(d) {
+  if (!d) return; net.lastRx = performance.now();
+  if (d.t === 'pg') return;
+  if (net.role === 'host') {
+    if (d.t === 'hi') net.p2skin = clamp(d.skin | 0, 0, WOLF_SKINS.length - 1);
+    else if (d.t === 'in') { players[1].in.vx = clamp(+d.vx || 0, -1, 1); players[1].in.vy = clamp(+d.vy || 0, -1, 1); }
+    else if (d.t === 'dr') drink(players[1]);
+  } else if (net.role === 'guest') {
+    if (d.t === 'start') { net.hostSkin = d.hs | 0; startLevel(d.L); }
+    else if (d.t === 'st') applySnap(d);
+  }
+}
+function buildSnap() {
+  const q = {
+    t: 'st', sc: scene, L, lv: lives, g: got, s: score, om: overMsg, wm: winMsg,
+    w: players.map(P => ({ x: +P.x.toFixed(1), y: +P.y.toFixed(1), f: P.face, e: +P.energyT.toFixed(2), dr: +P.drinkT.toFixed(2), st: P.stock, iv: +P.inv.toFixed(2), k: P.skin, o: P.on ? 1 : 0 })),
+    m: matchas.map(m => [Math.round(m.x), Math.round(m.y), m.gold ? 1 : 0, +m.ph.toFixed(1)]),
+    r: rivals.map(e => { const o = { x: +e.x.toFixed(1), y: +e.y.toFixed(1), t: +e.t.toFixed(2), st: e.st, tele: e.tele || null }; if (e.type === 'queue') o.sg = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => { const p = e.hist[Math.max(0, e.hist.length - 1 - k * 22)]; return [Math.round(p.x), Math.round(p.y)]; }); return o; }),
+    h: hazards.map(h => { const o = Object.assign({}, h); delete o.own; return o; }),
+    p: princess ? { x: princess.x, y: princess.y, t: princess.t } : null, ev: net.evq
+  };
+  net.evq = []; return q;
+}
+function applyEv(ev) {
+  const me = players.indexOf(wolf);
+  for (const e of ev) {
+    if (e[0] === 'p') _popup(e[1], e[2], e[3], e[4]); else if (e[0] === 'b') _burst(e[1], e[2], e[3], e[4]); else if (e[0] === 's') { if (_sfx[e[1]]) _sfx[e[1]](); }
+    else if (e[0] === 'pu' && e[1] === me) { punch = { t: 0 }; shake = .5; }
+  }
+}
+function applySnap(d) {
+  if (d.sc === 'cleared' || d.sc === 'over' || d.sc === 'final') { if (scene !== d.sc) { scene = d.sc; setBtns(); } }
+  L = d.L; lives = d.lv; got = d.g; score = d.s; overMsg = d.om; winMsg = d.wm;
+  d.w.forEach((q, i) => {
+    const P = players[i]; if (!P) return; P.on = !!q.o; P.skin = q.k; P.stock = q.st; P.energyT = q.e; P.drinkT = q.dr; P.inv = q.iv;
+    if (P === wolf) { const ex = q.x - P.x, ey = q.y - P.y, er = Math.hypot(ex, ey); if (er > 70) { P.x = q.x; P.y = q.y; } else if (er > 35) { P.x += ex * .25; P.y += ey * .25; } }
+    else { P.face = q.f; P.tx = q.x; P.ty = q.y; if (P.x === undefined || Math.hypot(P.x - q.x, P.y - q.y) > 150) { P.x = q.x; P.y = q.y; } }
+  });
+  matchas = d.m.map(a => ({ x: a[0], y: a[1], gold: !!a[2], ph: a[3], r: 15 }));
+  d.r.forEach((q, i) => {
+    const e = rivals[i]; if (!e) return; e.t = q.t; e.st = q.st; e.tele = q.tele;
+    if (q.sg) { const hs = new Array(221); for (let k = 0; k < 221; k++) hs[k] = { x: q.sg[9][0], y: q.sg[9][1] }; for (let k = 0; k < 10; k++) hs[220 - k * 22] = { x: q.sg[k][0], y: q.sg[k][1] }; e.hist = hs; e.x = q.x; e.y = q.y; }
+    else { e.qx = q.x; e.qy = q.y; if (Math.hypot(e.x - q.x, e.y - q.y) > 150) { e.x = q.x; e.y = q.y; } }
+  });
+  hazards = d.h; princess = d.p;
+  applyEv(d.ev || []);
+}
+function guestUpdate(dt) {
+  time += dt; if (shake > 0) shake -= dt;
+  const [vx, vy] = inputVec(); stepWolf(wolf, vx, vy, dt);
+  for (const P of players) if (P.on && P !== wolf && P.tx !== undefined) { P.x += (P.tx - P.x) * .35; P.y += (P.ty - P.y) * .35; P.moving = Math.hypot(P.tx - P.x, P.ty - P.y) > 2; }
+  for (const e of rivals) if (e.qx !== undefined) { e.x += (e.qx - e.x) * .5; e.y += (e.qy - e.y) * .5; }
+  parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .93; p.vy *= .93; p.life -= dt; }); parts = parts.filter(p => p.life > 0);
+  popups.forEach(p => { p.y -= 34 * dt; p.life -= dt; }); popups = popups.filter(p => p.life > 0);
+}
+function netTick(dt) {
+  if (!net.role || !net.joined) return;
+  net.ping += dt; if (net.ping >= 1) { net.ping = 0; netSend({ t: 'pg' }); }
+  if (performance.now() - net.lastRx > 6000) { netLost(); return; }
+  net.acc += dt; if (net.acc < 1 / 30) return; net.acc = 0;
+  if (net.role === 'host') { if (['play', 'cleared', 'over', 'final'].includes(scene)) netSend(buildSnap()); }
+  else if (net.role === 'guest' && scene === 'play') { const [vx, vy] = inputVec(); netSend({ t: 'in', vx: +vx.toFixed(2), vy: +vy.toFixed(2) }); }
+}
+function drawNet() {
+  ctx.drawImage(bgCache0, 0, 0); ctx.fillStyle = 'rgba(0,0,0,.62)'; ctx.fillRect(0, 0, W, H);
+  const bad = /hata|ulaşıl|bulunamadı|koptu|yüklenemedi|Bağlanılamadı|desteklem/i.test(net.status), sc2 = bad ? '#ff9a9a' : '#bfe9c9';
+  const slots = (x0, y0, w, h, gap, code, size) => { for (let i = 0; i < 4; i++) { const x = x0 + i * (w + gap); ctx.fillStyle = 'rgba(255,255,255,.1)'; rr(x, y0, w, h, 14); ctx.fill(); ctx.strokeStyle = code[i] ? '#9be36b' : 'rgba(255,255,255,.3)'; ctx.lineWidth = 3; ctx.stroke(); if (code[i]) txt(code[i], x + w / 2, y0 + h / 2 + 2, size, '#fff', 'center', '900'); } };
+  if (scene === 'online') {
+    panel(170, 100, 620, 350); txt('👥 ÇEVRİMİÇİ CO-OP', W / 2, 155, 40, '#fff', 'center', '900');
+    wrap('Arkadaşınla aynı kurt takımında oyna. Biri oda kurar ve kodu söyler, diğeri kodla girer.', W / 2, 212, 520, 28, 20, '#cfe6d4', 'center');
+    txt('4 can ortak · matcha ortak · her biri kendi skiniyle', W / 2, 430, 17, 'rgba(255,255,255,.6)', 'center', '600', false);
+  } else if (scene === 'host') {
+    panel(110, 70, 740, 470); txt('ODA KODU', W / 2, 112, 26, '#9be36b');
+    slots(279, 138, 90, 100, 14, net.code.padEnd(4, ' ').split('').map(c => c.trim()), 68);
+    txt(net.joined ? 'Oyuncu 2 bağlandı ✔' : net.status, W / 2, 285, 24, net.joined ? '#9be36b' : sc2);
+    if (!net.joined) wrap('Arkadaşın "ODAYA GİR" diyip bu kodu yazsın.', W / 2, 335, 560, 30, 21, '#cfe6d4', 'center');
+    else { txt('Başlangıç: Bölüm ' + (net.startL + 1) + ' · ' + LEVELS[net.startL].name, W / 2, 360, 24, '#ffe08a'); }
+  } else if (scene === 'join') {
+    panel(60, 66, 840, 500); txt('ODA KODUNU GİR', W / 2, 105, 28, '#9be36b');
+    slots(322, 128, 70, 76, 12, joinCode.padEnd(4, ' ').split('').map(c => c.trim()), 52);
+    txt(net.status || 'Arkadaşının ekranındaki 4 haneli kodu yaz.', W / 2, 228, 20, net.status ? sc2 : 'rgba(255,255,255,.7)', 'center', '600', false);
+  } else if (scene === 'lobbyG') {
+    panel(170, 130, 620, 300); txt('BAĞLANDI ✔', W / 2, 190, 48, '#9be36b', 'center', '900'); wrap('Host oyunu başlatınca oyun açılacak. Hazır ol, kurt!', W / 2, 260, 520, 32, 24, '#e8f3ea', 'center');
+  } else if (scene === 'netlost') {
+    panel(170, 130, 620, 300); txt('BAĞLANTI KOPTU', W / 2, 200, 46, '#ff9a9a', 'center', '900'); wrap('Arkadaşın odadan çıktı ya da internet gitti.', W / 2, 270, 520, 32, 24, '#e8f3ea', 'center');
+  }
+}
+
 /* ---------- HUD ve düğmeler ---------- */
 function setBtns() {
   btns = [];
@@ -734,13 +913,14 @@ function setBtns() {
   if (scene === 'menu') {
     const prog = progress > 0, snd = () => muted ? '🔇 SES KAPALI' : '🔊 SES AÇIK';
     const setMode = m => { storyMode = m; try { localStorage.setItem('matchaMode', m ? 'story' : 'classic'); } catch (e) { } };
-    B(W / 2 - 190, 296, 380, 66, prog ? '📖 HİKAYE · DEVAM ET' : '📖 HİKAYE MODU', () => { setMode(true); beginLevelFlow(progress); }, '#3fae5a');
-    B(W / 2 - 190, 370, 380, 54, '🎮 KLASİK MOD (hikayesiz)', () => { setMode(false); L = progress; scene = 'story'; setBtns(); }, '#2c8f8f');
-    B(W / 2 - 190, 432, 380, 54, '🎨 SKİNLER', () => { scene = 'skins'; setBtns(); }, '#9a4fc4');
+    B(W / 2 - 190, 284, 380, 58, prog ? '📖 HİKAYE · DEVAM ET' : '📖 HİKAYE MODU', () => { setMode(true); beginLevelFlow(progress); }, '#3fae5a');
+    B(W / 2 - 190, 348, 380, 50, '🎮 KLASİK MOD (hikayesiz)', () => { setMode(false); L = progress; scene = 'story'; setBtns(); }, '#2c8f8f');
+    B(W / 2 - 190, 404, 380, 50, '👥 ÇEVRİMİÇİ CO-OP (oda kodu)', () => { net.status = ''; scene = 'online'; setBtns(); }, '#d0701f');
+    B(W / 2 - 190, 460, 380, 50, '🎨 SKİNLER', () => { scene = 'skins'; setBtns(); }, '#9a4fc4');
     if (prog) {
-      B(W / 2 - 190, 494, 185, 50, 'BAŞTAN', () => { progress = 0; saveProg(); score = 0; setMode(true); beginLevelFlow(0); }, '#2c6fb0');
-      B(W / 2 + 5, 494, 185, 50, snd(), () => { muted = !muted; setBtns(); }, '#6a5a8a');
-    } else B(W / 2 - 190, 494, 380, 50, snd(), () => { muted = !muted; setBtns(); }, '#6a5a8a');
+      B(W / 2 - 190, 516, 185, 46, 'BAŞTAN', () => { progress = 0; saveProg(); score = 0; setMode(true); beginLevelFlow(0); }, '#2c6fb0');
+      B(W / 2 + 5, 516, 185, 46, snd(), () => { muted = !muted; setBtns(); }, '#6a5a8a');
+    } else B(W / 2 - 190, 516, 380, 46, snd(), () => { muted = !muted; setBtns(); }, '#6a5a8a');
   } else if (scene === 'skins') {
     B(24, 24, 140, 52, '‹ GERİ', () => { saveSkin(); skinPage = 0; scene = 'menu'; setBtns(); }, '#555a66');
     B(190, 24, 170, 52, '🐺 KURT', () => { skinTab = 0; skinPage = 0; setBtns(); }, skinTab === 0 ? '#3fae5a' : '#3a4a40');
@@ -764,19 +944,39 @@ function setBtns() {
       B(830, 492, 100, 48, '▶', () => { skinPage = (skinPage + 1) % pages; setBtns(); }, '#3a4a40');
       btns.push({ x: 600, y: 492, w: 215, h: 48, fn: () => { }, render: () => txt('Sayfa ' + (skinPage + 1) + ' / ' + pages, 707, 516, 20, '#e6f3ea', 'center', '700', false) });
     }
+  } else if (scene === 'online') {
+    B(W / 2 - 160, 268, 320, 64, '🏠 ODA KUR', () => { scene = 'host'; hostRoom(0); setBtns(); }, '#3fae5a');
+    B(W / 2 - 160, 344, 320, 64, '🔑 ODAYA GİR', () => { scene = 'join'; joinCode = ''; net.status = ''; setBtns(); }, '#2c6fb0');
+    B(24, 24, 140, 52, '‹ GERİ', () => { scene = 'menu'; setBtns(); }, '#555a66');
+  } else if (scene === 'host') {
+    B(24, 24, 140, 52, '‹ ÇIK', leaveNet, '#555a66');
+    if (net.joined) {
+      B(W / 2 - 215, 392, 90, 50, '◀', () => { net.startL = (net.startL + LEVELS.length - 1) % LEVELS.length; }, '#3a4a40');
+      B(W / 2 + 125, 392, 90, 50, '▶', () => { net.startL = (net.startL + 1) % LEVELS.length; }, '#3a4a40');
+      B(W / 2 - 170, 456, 340, 66, 'BAŞLA  ▶', () => startLevel(net.startL), '#3fae5a');
+    }
+  } else if (scene === 'join') {
+    B(24, 24, 140, 52, '‹ GERİ', leaveNet, '#555a66');
+    CODE_CH.split('').forEach((ch, i) => B(148 + (i % 7) * 96, 248 + Math.floor(i / 7) * 62, 88, 54, ch, () => { if (joinCode.length < 4) joinCode += ch; }, '#3a5a8a'));
+    B(148, 500, 200, 50, '⌫ SİL', () => { joinCode = joinCode.slice(0, -1); }, '#8a4a3a');
+    B(612, 500, 200, 50, 'GİR ▶', tryJoin, '#3fae5a');
+  } else if (scene === 'lobbyG' || scene === 'netlost') {
+    B(W / 2 - 150, 400, 300, 60, scene === 'netlost' ? 'MENÜ' : 'ODADAN ÇIK', leaveNet, '#555a66');
   } else if (scene === 'cut') {
     B(W - 164, 18, 146, 48, 'GEÇ  ⏭', skipCut, '#555a66');
   } else if (scene === 'story') {
     B(W / 2 - 160, 470, 320, 76, 'BAŞLA!', () => startLevel(L), '#3fae5a');
     B(24, 24, 130, 48, '‹ MENÜ', () => { scene = 'menu'; setBtns(); }, '#555a66');
   } else if (scene === 'over') {
-    B(W / 2 - 170, 330, 340, 76, 'TEKRAR DENE', () => startLevel(L), '#e0883a');
-    B(W / 2 - 170, 424, 340, 60, 'MENÜ', () => { scene = 'menu'; setBtns(); }, '#555a66');
+    if (net.role === 'guest') B(W / 2 - 170, 330, 340, 70, 'ODADAN ÇIK', leaveNet, '#555a66');
+    else { B(W / 2 - 170, 330, 340, 76, 'TEKRAR DENE', () => startLevel(L), '#e0883a');
+    B(W / 2 - 170, 424, 340, 60, 'MENÜ', () => { if (net.role) leaveNet(); else { scene = 'menu'; setBtns(); } }, '#555a66'); }
   } else if (scene === 'cleared') {
-    if (L < LEVELS.length - 1) B(W / 2 - 170, 440, 340, 76, 'SONRAKİ BÖLÜM  ▶', () => { beginLevelFlow(L + 1); }, '#3fae5a');
-    else B(W / 2 - 170, 440, 340, 76, 'FİNALE GİT  ★', () => { const fin = () => { scene = 'final'; setBtns(); }; if (storyMode) runCut(STORY.epilogue, L, fin); else fin(); }, '#d9a21b');
+    if (net.role === 'guest') B(W / 2 - 170, 440, 340, 60, 'ODADAN ÇIK', leaveNet, '#555a66');
+    else if (L < LEVELS.length - 1) B(W / 2 - 170, 440, 340, 76, 'SONRAKİ BÖLÜM  ▶', () => { beginLevelFlow(L + 1); }, '#3fae5a');
+    else B(W / 2 - 170, 440, 340, 76, 'FİNALE GİT  ★', () => { const fin = () => { scene = 'final'; setBtns(); }; if (storyMode && !net.role) runCut(STORY.epilogue, L, fin); else fin(); }, '#d9a21b');
   } else if (scene === 'final') {
-    B(W / 2 - 170, 470, 340, 70, 'MENÜYE DÖN', () => { progress = 0; saveProg(); scene = 'menu'; setBtns(); }, '#3fae5a');
+    B(W / 2 - 170, 470, 340, 70, 'MENÜYE DÖN', () => { if (net.role) { leaveNet(); return; } progress = 0; saveProg(); scene = 'menu'; setBtns(); }, '#3fae5a');
   } else if (scene === 'play') {
     // oyun içi düğmeleri HUD çiziyor
   }
@@ -797,13 +997,13 @@ const pauseBtn = { x: W - 42, y: 36, r: 24 }, muteBtn = { x: W - 100, y: 36, r: 
 function drawHUD() {
   const lv = LEVELS[L];
   ctx.fillStyle = 'rgba(10,25,15,.62)'; rr(10, 8, W - 20, 62, 16); ctx.fill();
-  for (let i = 0; i < 3; i++) emoji(i < lives ? '❤️' : '🖤', 40 + i * 40, 39, 28);
+  for (let i = 0; i < maxLives; i++) emoji(i < lives ? '❤️' : '🖤', 40 + i * 40, 39, 28);
   txt('Bölüm ' + (L + 1) + ' · ' + lv.name, W / 2, 24, 22, '#fff');
   const bw = 320, bx = W / 2 - bw / 2, by = 44; ctx.fillStyle = 'rgba(255,255,255,.18)'; rr(bx, by, bw, 16, 8); ctx.fill();
   const k = Math.min(1, got / lv.quota); if (k > 0) { const g = ctx.createLinearGradient(bx, 0, bx + bw, 0); g.addColorStop(0, '#9be36b'); g.addColorStop(1, '#3fae5a'); ctx.fillStyle = g; rr(bx, by, Math.max(16, bw * k), 16, 8); ctx.fill(); }
   txt('🍵 ' + Math.min(got, lv.quota) + ' / ' + lv.quota, W / 2, by + 8, 13, '#fff', 'center', '800', false);
   txt('Aura ' + score, W - 140, 39, 22, '#ffe08a', 'right');
-  [[pauseBtn, paused ? '▶' : '❚❚'], [muteBtn, muted ? '🔇' : '🔊']].forEach(([b, ic]) => { ctx.fillStyle = 'rgba(255,255,255,.16)'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill(); ic.length > 1 && ic !== '❚❚' ? emoji(ic, b.x, b.y + 1, 22) : txt(ic, b.x, b.y + 1, 18, '#fff', 'center', '900', false); });
+  [[pauseBtn, paused ? '▶' : '❚❚'], [muteBtn, muted ? '🔇' : '🔊']].filter(a => !(net.role && a[0] === pauseBtn)).forEach(([b, ic]) => { ctx.fillStyle = 'rgba(255,255,255,.16)'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill(); ic.length > 1 && ic !== '❚❚' ? emoji(ic, b.x, b.y + 1, 22) : txt(ic, b.x, b.y + 1, 18, '#fff', 'center', '900', false); });
   if (princess) { const a = Math.atan2(princess.y - wolf.y, princess.x - wolf.x); ctx.save(); ctx.translate(wolf.x + Math.cos(a) * 44, wolf.y + Math.sin(a) * 44); ctx.rotate(a); ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-6, -8); ctx.lineTo(-6, 8); ctx.closePath(); ctx.fill(); ctx.restore(); txt('Prenses\'e git!', W / 2, FIELD_TOP + 14, 22, '#ffe08a'); }
   // matcha iç düğmesi
   const can = wolf.stock > 0, act = wolf.energyT > 0;
@@ -865,7 +1065,7 @@ let bgCache0 = getBG(0);
 /* ---------- ana çizim ---------- */
 function draw() {
   ctx.save(); ctx.clearRect(0, 0, W, H);
-  if (scene === 'menu') drawMenu(); else if (scene === 'skins') drawSkins(); else if (scene === 'cut') drawCut(); else if (scene === 'story') drawStory(); else if (scene === 'final') drawFinal();
+  if (scene === 'menu') drawMenu(); else if (scene === 'skins') drawSkins(); else if (scene === 'cut') drawCut(); else if (['online', 'host', 'join', 'lobbyG', 'netlost'].includes(scene)) drawNet(); else if (scene === 'story') drawStory(); else if (scene === 'final') drawFinal();
   else {
     if (shake > 0) ctx.translate(rand(-5, 5) * shake * 3, rand(-5, 5) * shake * 3);
     ctx.drawImage(bgCache, 0, 0);
@@ -874,7 +1074,7 @@ function draw() {
     matchas.forEach(m => objs.push([m.y, () => drawMatcha(m)]));
     if (princess) objs.push([princess.y, () => drawPrincess(princess)]);
     rivals.forEach(e => objs.push([e.y, () => drawRival(e)]));
-    objs.push([wolf.y, drawWolf]);
+    players.forEach(P => { if (P.on) objs.push([P.y, () => drawWolf(P)]); });
     objs.sort((a, b) => a[0] - b[0]).forEach(o => o[1]());
     drawHazards();
     parts.forEach(p => { ctx.globalAlpha = Math.max(0, p.life / p.max); if (p.ch) emoji(p.ch, p.x, p.y, p.r * 7); else { ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); } }); ctx.globalAlpha = 1;
@@ -899,7 +1099,7 @@ cv.addEventListener('pointerdown', e => {
   for (const b of btns) if (p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h) { sfx.ui(); b.fn(); return; }
   if (scene === 'cut') { advanceCut(); return; }
   if (scene !== 'play') return;
-  if (dist(p, pauseBtn) < pauseBtn.r + 10) { paused = !paused; joyState.id = null; return; }
+  if (dist(p, pauseBtn) < pauseBtn.r + 10) { if (!net.role) paused = !paused; joyState.id = null; return; }
   if (dist(p, muteBtn) < muteBtn.r + 10) { muted = !muted; return; }
   if (paused) return;
   if (dist(p, dashBtn) < dashBtn.r + 14) { doDash(); return; }
@@ -913,9 +1113,10 @@ const codeMap = { KeyW: 'w', KeyA: 'a', KeyS: 's', KeyD: 'd', KeyE: 'e', KeyP: '
 function keyOf(e) { return codeMap[e.code] || e.key.toLowerCase(); }
 window.addEventListener('keydown', e => {
   const k = keyOf(e); keys[k] = true; audioInit();
+  if (scene === 'join') { const u = e.key.toUpperCase(); if (u === 'BACKSPACE') joinCode = joinCode.slice(0, -1); else if (u === 'ENTER') tryJoin(); else if (u.length === 1 && CODE_CH.includes(u) && joinCode.length < 4) joinCode += u; }
   if (scene === 'cut' && !e.repeat && (k === ' ' || k === 'e' || k === 'enter')) advanceCut();
   if ((k === 'e' || k === ' ') && !e.repeat) doDash();
-  if (k === 'p' && !e.repeat && scene === 'play') paused = !paused;
+  if (k === 'p' && !e.repeat && scene === 'play' && !net.role) paused = !paused;
   if (k.startsWith('arrow') || k === ' ') e.preventDefault();
 });
 window.addEventListener('keyup', e => { keys[keyOf(e)] = false; });
@@ -928,7 +1129,8 @@ function loop(now) {
   if (scene === 'cut' && cut) { const ln = cut.lines[cut.i]; if (cut.c < ln[1].length) { const before = Math.floor(cut.c / 3); cut.c = Math.min(ln[1].length, cut.c + dt * 48); if (Math.floor(cut.c / 3) !== before && ln[0] !== 'narr') beep(ln[0] === 'wolf' ? 210 : 330 + (ln[0].length * 17) % 120, .03, 'square', .02); } }
   if (punch) { punch.t += dt; if (punch.t > .95) punch = null; }
   try {
-  if (scene === 'play' || scene === 'over' || scene === 'cleared') { if (scene === 'play') update(dt); else { time += dt; parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; }); parts = parts.filter(p => p.life > 0); } } else time += dt;
+  if (scene === 'play' || scene === 'over' || scene === 'cleared') { if (scene === 'play') { if (net.role === 'guest') guestUpdate(dt); else update(dt); } else { time += dt; parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; }); parts = parts.filter(p => p.life > 0); } } else time += dt;
+  netTick(dt);
   draw();
   } catch (err) { console.error(err); }
   requestAnimationFrame(loop);
