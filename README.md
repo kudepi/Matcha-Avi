@@ -23,3 +23,4 @@ Not: Tüm karakterler kurgusal parodidir.
 Menü → "ÇEVRİMİÇİ CO-OP". Biri "ODA KUR" der ve ekrandaki 4 haneli kodu söyler, öteki "ODAYA GİR" ile kodu yazar.
 Oyunu oda kurucunun tarayıcısı çalıştırır, öteki oyuncu tuşlarını gönderir. Eşleştirme için ücretsiz PeerJS bulut sunucusu kullanılır,
 bu yüzden `peerjs.min.js` dosyası `app.py` ile aynı klasörde durmalıdır. Okul ağı WebRTC bağlantısını engelliyorsa bağlantı kurulamayabilir.
+https://matcha-avi.streamlit.app/
