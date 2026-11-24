@@ -21,6 +21,12 @@ Not: Tüm karakterler kurgusal parodidir.
 
 ## Çevrimiçi co-op (oda kodu)
 Menü → "ÇEVRİMİÇİ CO-OP". Biri "ODA KUR" der ve ekrandaki 4 haneli kodu söyler, öteki "ODAYA GİR" ile kodu yazar.
-Oyunu oda kurucunun tarayıcısı çalıştırır, öteki oyuncu tuşlarını gönderir. Eşleştirme için ücretsiz PeerJS bulut sunucusu kullanılır,
-bu yüzden `peerjs.min.js` dosyası `app.py` ile aynı klasörde durmalıdır. Okul ağı WebRTC bağlantısını engelliyorsa bağlantı kurulamayabilir.
-https://matcha-avi.streamlit.app/
+Oyunu oda kurucunun tarayıcısı çalıştırır, öteki oyuncu tuşlarını gönderir. Cihaz/marka fark etmez (Mac, Windows, telefon, tablet).
+Bağlantı önce WebRTC (PeerJS, `peerjs.min.js` `app.py` ile aynı klasörde olmalı) ile denenir; ~3 sn içinde kurulamazsa
+otomatik olarak yedek hatta (halka açık MQTT sunucuları üzerinden WebSocket) geçilir. Yedek hat biraz daha gecikmeli olabilir ve
+halka açık olduğu için oda kodunu sadece arkadaşınla paylaş. Okul ağı her iki yolu da engelliyorsa bağlantı kurulamaz.
+
+## Yenilikler
+- Büyük harita (1600×1000) + kamera takibi + mini harita
+- Yeni rakipler: Dolmuş Şoförü (kırmızı şeritte hasar), Kargo Kuryesi (patlayan paketler), Hırsız Kedi (matcha çalar, yakalarsan geri verir), Poşet Teyze (giden-gelen poşet)
+- Matcha enerjisi zamanla azalır (yaklaşık 6 sn); ne kadar enerji varsa o kadar hız ve mıknatıs
