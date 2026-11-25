@@ -13,10 +13,6 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Yayınlama (Streamlit Community Cloud)
-1. Bu klasörü GitHub'a yükle (`app.py`, `game.html`, `requirements.txt`, `.streamlit/`).
-2. share.streamlit.io → New app → depo ve `app.py` seç → Deploy.
-
 Not: Tüm karakterler kurgusal parodidir.
 
 ## Çevrimiçi co-op (oda kodu)
